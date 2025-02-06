@@ -1,10 +1,10 @@
 import { Button, Divider, Form, Input } from 'antd';
 import type { FormProps } from 'antd';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './register.scss';
-import { loginAPI } from '@/services/api';
-
+import { registerAPI } from 'services/api';
+import { App } from 'antd';
 type FieldType = {
 	fullName: string;
 	email: string;
@@ -13,10 +13,30 @@ type FieldType = {
 };
 
 const RegisterPage = () => {
+	// notifycation
+	const { message } = App.useApp();
+
+	// state
 	const [isSubmit, setIsSubmit] = useState(false);
 
+	// hook
+	const navigate = useNavigate();
+
 	const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
-		console.log(values);
+		setIsSubmit(true);
+
+		const { fullName, email, password, phone } = values;
+
+		let res = await registerAPI(fullName, email, password, phone);
+
+		if (res && res.data) {
+			message.success('Đăng ký tài khoản thành công');
+			navigate('/login');
+		} else {
+			message.error(res.message);
+		}
+
+		setIsSubmit(false);
 	};
 
 	return (
