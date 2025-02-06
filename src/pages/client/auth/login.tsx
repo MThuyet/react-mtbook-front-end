@@ -4,6 +4,7 @@ import './login.scss';
 import type { FormProps } from 'antd';
 import { Button, Divider, Form, Input, App } from 'antd';
 import { loginAPI } from 'services/api';
+import { useCurrentApp } from '@/components/context/app.context';
 
 // define type
 type FieldType = {
@@ -17,6 +18,7 @@ const Login: React.FC = () => {
 	// hook
 	const { message, notification } = App.useApp();
 	const navigate = useNavigate();
+	const { setIsAuthenticated, setUser } = useCurrentApp();
 
 	// state
 	const [isSubmit, setIsSubmit] = useState(false);
@@ -31,8 +33,15 @@ const Login: React.FC = () => {
 		setIsSubmit(false);
 
 		if (res && res.data) {
+			// set context
+			setIsAuthenticated(true);
+			setUser(res.data.user);
+
+			// save access_token to localStorage
 			localStorage.setItem('access_token', res.data.access_token);
 			message.success('Đăng nhập thành công');
+
+			// redirect
 			navigate('/');
 		} else {
 			notification.error({
