@@ -17,9 +17,6 @@ const RegisterPage = () => {
 
 	const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
 		console.log(values);
-
-		const res = await loginAPI('user@gmail.com', '123456');
-		console.log(res);
 	};
 
 	return (
