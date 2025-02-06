@@ -5,6 +5,7 @@ import {
 	createBrowserRouter,
 	RouterProvider,
 } from "react-router-dom";
+import HomePage from 'pages/client/home';
 import BookPage from 'pages/client/book';
 import AboutPage from 'pages/client/about';
 import LoginPage from 'pages/client/auth/login';
@@ -16,6 +17,10 @@ const router = createBrowserRouter([
 		path: "/",
 		element: <Layout />,
 		children: [
+			{
+				index: true,
+				element: <HomePage />,
+			},
 			{
 				path: "/book",
 				element: <BookPage />,
