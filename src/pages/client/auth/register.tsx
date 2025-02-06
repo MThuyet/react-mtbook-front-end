@@ -1,10 +1,11 @@
-import { Button, Divider, Form, Input } from 'antd';
+import { Button, Divider, Form, Input, App } from 'antd';
 import type { FormProps } from 'antd';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './register.scss';
 import { registerAPI } from 'services/api';
-import { App } from 'antd';
+
+// define type
 type FieldType = {
 	fullName: string;
 	email: string;
@@ -13,15 +14,14 @@ type FieldType = {
 };
 
 const RegisterPage = () => {
-	// notifycation
-	const { message } = App.useApp();
+	// hook
+	const { message, notification } = App.useApp();
+	const navigate = useNavigate();
 
 	// state
 	const [isSubmit, setIsSubmit] = useState(false);
 
-	// hook
-	const navigate = useNavigate();
-
+	// function
 	const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
 		setIsSubmit(true);
 
@@ -33,7 +33,10 @@ const RegisterPage = () => {
 			message.success('Đăng ký tài khoản thành công');
 			navigate('/login');
 		} else {
-			message.error(res.message);
+			notification.error({
+				message: 'Đăng kí không thành công!',
+				description: res.message
+			})
 		}
 
 		setIsSubmit(false);

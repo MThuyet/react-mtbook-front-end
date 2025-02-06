@@ -47,7 +47,7 @@ const router = createBrowserRouter([
 createRoot(document.getElementById('root')!).render(
 	<StrictMode>
 		{/* <Layout /> */}
-		<App>
+		<App message={{ maxCount: 2 }} notification={{ placement: "topRight" }}>
 			<RouterProvider router={router} />
 		</App>
 	</StrictMode>,

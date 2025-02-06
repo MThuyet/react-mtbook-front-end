@@ -19,7 +19,7 @@ declare global {
 	}
 
 	interface ILogin {
-		accessToken: string;
+		access_token: string;
 		user: {
 			email: string;
 			phone: string;
