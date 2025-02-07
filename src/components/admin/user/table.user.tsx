@@ -2,63 +2,13 @@ import { getUsersAPI } from '@/services/api';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable, TableDropdown } from '@ant-design/pro-components';
-import { Button, Space, Tag } from 'antd';
+import { Button, Space, Tag, DrawerProps, DescriptionsProps, Descriptions, Drawer } from 'antd';
 import { useRef, useState } from 'react';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { dateRangeValidate } from "@/services/helper";
-
-const columns: ProColumns<IUserTable>[] = [
-	{
-		dataIndex: 'index',
-		valueType: 'indexBorder',
-		width: 48,
-	},
-	{
-		title: 'ID',
-		dataIndex: '_id',
-		hideInSearch: true,
-		render(dom, entity, index, action, schema) {
-			return (
-				<a href="#">{entity._id}</a>
-			)
-		},
-	},
-	{
-		title: 'Full name',
-		dataIndex: 'fullName',
-		sorter: true,
-	},
-	{
-		title: 'Email',
-		dataIndex: 'email',
-		copyable: true,
-	},
-	{
-		title: 'Created at',
-		dataIndex: 'createdAt',
-		valueType: 'date',
-		sorter: true,
-		hideInSearch: true,
-	},
-	{
-		title: 'Created at',
-		dataIndex: 'createdAtRange',
-		valueType: 'dateRange',
-		hideInTable: true,
-	},
-	{
-		title: 'Actions',
-		hideInSearch: true,
-		render: () => {
-			return (
-				<>
-					<Button style={{ marginRight: '10px', borderColor: 'rgb(231, 112, 13' }} ><EditOutlined style={{ color: 'rgb(231, 112, 13' }} /></Button>
-					<Button style={{ borderColor: '#f5222d' }}><DeleteOutlined style={{ color: '#f5222d' }} /></Button>
-				</>
-			);
-		}
-	},
-];
+import { DetailUser } from 'components/admin/user/detail.user';
+import dayjs from 'dayjs';
+import { FORMATE_DATE_VN } from '@/services/helper';
 
 type TSearch = {
 	fullName: string;
@@ -75,6 +25,70 @@ const TableUser = () => {
 		pages: 0,
 		total: 0
 	});
+
+	const [openViewDetail, setOpenViewDetail] = useState<boolean>(false);
+	const [dataViewDetail, setDataViewDetail] = useState<IUserTable | null>(null);
+
+	const columns: ProColumns<IUserTable>[] = [
+		{
+			dataIndex: 'index',
+			valueType: 'indexBorder',
+			width: 48,
+		},
+		{
+			title: 'ID (Click to see detail)',
+			dataIndex: '_id',
+			hideInSearch: true,
+			render(dom, entity, index, action, schema) {
+				return (
+					<a onClick={() => {
+						setDataViewDetail(entity)
+						setOpenViewDetail(true)
+					}}
+						href="#">{entity._id}</a>
+				)
+			},
+		},
+		{
+			title: 'Full name',
+			dataIndex: 'fullName',
+			sorter: true,
+		},
+		{
+			title: 'Email',
+			dataIndex: 'email',
+			copyable: true,
+		},
+		{
+			title: 'Created at',
+			dataIndex: 'createdAt',
+			sorter: true,
+			hideInSearch: true,
+			render(dom, entity, index, action, schema) {
+				return (
+					<>{dayjs(entity.createdAt).format(FORMATE_DATE_VN)}</>
+				)
+			},
+		},
+		{
+			title: 'Created at',
+			dataIndex: 'createdAtRange',
+			hideInTable: true,
+			valueType: 'dateRange',
+		},
+		{
+			title: 'Actions',
+			hideInSearch: true,
+			render: () => {
+				return (
+					<>
+						<Button style={{ marginRight: '10px', borderColor: 'rgb(231, 112, 13' }} ><EditOutlined style={{ color: 'rgb(231, 112, 13' }} /></Button>
+						<Button style={{ borderColor: '#f5222d' }}><DeleteOutlined style={{ color: '#f5222d' }} /></Button>
+					</>
+				);
+			}
+		},
+	];
 
 	return (
 		<>
@@ -149,6 +163,13 @@ const TableUser = () => {
 					</Button>
 
 				]}
+			/>
+
+			<DetailUser
+				openViewDetail={openViewDetail}
+				dataViewDetail={dataViewDetail}
+				setOpenViewDetail={setOpenViewDetail}
+				setDataViewDetail={setDataViewDetail}
 			/>
 		</>
 	);

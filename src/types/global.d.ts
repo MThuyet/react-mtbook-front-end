@@ -53,6 +53,7 @@ declare global {
 		_id: string;
 		email: string;
 		fullName: string;
+		phone: string;
 		role: string;
 		avatar: string;
 		isActive: boolean;
