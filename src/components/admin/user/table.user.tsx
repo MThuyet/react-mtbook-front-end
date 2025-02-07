@@ -5,6 +5,7 @@ import { ProTable, TableDropdown } from '@ant-design/pro-components';
 import { Button, Space, Tag } from 'antd';
 import { useRef, useState } from 'react';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { dateRangeValidate } from "@/services/helper";
 
 const columns: ProColumns<IUserTable>[] = [
 	{
@@ -25,6 +26,7 @@ const columns: ProColumns<IUserTable>[] = [
 	{
 		title: 'Full name',
 		dataIndex: 'fullName',
+		sorter: true,
 	},
 	{
 		title: 'Email',
@@ -34,6 +36,15 @@ const columns: ProColumns<IUserTable>[] = [
 	{
 		title: 'Created at',
 		dataIndex: 'createdAt',
+		valueType: 'date',
+		sorter: true,
+		hideInSearch: true,
+	},
+	{
+		title: 'Created at',
+		dataIndex: 'createdAtRange',
+		valueType: 'dateRange',
+		hideInTable: true,
 	},
 	{
 		title: 'Actions',
@@ -49,6 +60,13 @@ const columns: ProColumns<IUserTable>[] = [
 	},
 ];
 
+type TSearch = {
+	fullName: string;
+	email: string;
+	createdAt: string;
+	createdAtRange: string;
+}
+
 const TableUser = () => {
 	const actionRef = useRef<ActionType>();
 	const [meta, setMete] = useState({
@@ -60,14 +78,37 @@ const TableUser = () => {
 
 	return (
 		<>
-			<ProTable<IUserTable>
+			<ProTable<IUserTable, TSearch>
 				columns={columns}
 				actionRef={actionRef}
 				cardBordered
 				request={async (params, sort, filter) => {
-					console.log(params, sort, filter)
 
-					const res = await getUsersAPI(params?.current ?? 1, params?.pageSize ?? 5);
+					let query = ``;
+					if (params) {
+						query += `current=${params.current}&pageSize=${params.pageSize}`;
+						if (params.fullName) {
+							query += `&fullName=/${params.fullName}/i`;
+						}
+						if (params.email) {
+							query += `&email=/${params.email}/i`;
+						}
+
+						const createdAtRange = dateRangeValidate(params.createdAtRange);
+						if (createdAtRange) {
+							query += `&createdAt>=${createdAtRange[0]}&createdAt<=${createdAtRange[1]}`;
+						}
+					}
+
+					if (sort.fullName) {
+						query += `&sort=${sort.fullName === 'ascend' ? 'fullName' : '-fullName'}`
+					}
+
+					if (sort.createdAt) {
+						query += `&sort=${sort.createdAt === 'ascend' ? 'createdAt' : '-createdAt'}`
+					}
+
+					const res = await getUsersAPI(query);
 
 					if (res.data) {
 						setMete(res.data.meta);
