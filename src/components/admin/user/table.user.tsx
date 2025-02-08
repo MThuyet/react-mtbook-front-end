@@ -9,6 +9,7 @@ import { dateRangeValidate } from "@/services/helper";
 import { DetailUser } from 'components/admin/user/detail.user';
 import dayjs from 'dayjs';
 import { FORMATE_DATE_VN } from '@/services/helper';
+import CreateUser from 'components/admin/user/create.user';
 
 type TSearch = {
 	fullName: string;
@@ -26,8 +27,12 @@ const TableUser = () => {
 		total: 0
 	});
 
+	// View detail
 	const [openViewDetail, setOpenViewDetail] = useState<boolean>(false);
 	const [dataViewDetail, setDataViewDetail] = useState<IUserTable | null>(null);
+
+	// Create user
+	const [openModalCreate, setOpenModalCreate] = useState<boolean>(false);
 
 	const columns: ProColumns<IUserTable>[] = [
 		{
@@ -118,6 +123,8 @@ const TableUser = () => {
 						query += `&sort=${sort.fullName === 'ascend' ? 'fullName' : '-fullName'}`
 					}
 
+					query += `&sort=-createdAt`;
+
 					if (sort.createdAt) {
 						query += `&sort=${sort.createdAt === 'ascend' ? 'createdAt' : '-createdAt'}`
 					}
@@ -155,7 +162,7 @@ const TableUser = () => {
 						key="button"
 						icon={<PlusOutlined />}
 						onClick={() => {
-							actionRef.current?.reload();
+							setOpenModalCreate(true)
 						}}
 						type="primary"
 					>
@@ -170,6 +177,12 @@ const TableUser = () => {
 				dataViewDetail={dataViewDetail}
 				setOpenViewDetail={setOpenViewDetail}
 				setDataViewDetail={setDataViewDetail}
+			/>
+
+			<CreateUser
+				openModalCreate={openModalCreate}
+				setOpenModalCreate={setOpenModalCreate}
+				refreshTable={() => { actionRef.current?.reload() }}
 			/>
 		</>
 	);
