@@ -60,6 +60,7 @@ declare global {
 		isActive: boolean;
 		createdAt: Date;
 		updatedAt: Date;
+		__v: number;
 	}
 
 	interface IBulkCreateUser {

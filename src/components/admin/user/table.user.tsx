@@ -10,6 +10,7 @@ import dayjs from 'dayjs';
 import { FORMATE_DATE_VN } from '@/services/helper';
 import CreateUser from 'components/admin/user/create.user';
 import ImportUser from '@/components/admin/user/data/import.user';
+import { CSVLink } from "react-csv";
 
 type TSearch = {
 	fullName: string;
@@ -98,6 +99,20 @@ const TableUser = () => {
 		},
 	];
 
+	// export
+	const [currentDataTable, setCurrentDataTable] = useState<IUserTable[]>([]);
+
+	const headerCsvData = [
+		{ label: '_id', key: '_id' },
+		{ label: 'fullName', key: 'fullName' },
+		{ label: 'email', key: 'email' },
+		{ label: 'phone', key: 'phone' },
+		{ label: 'role', key: 'role' },
+		{ label: 'createdAt', key: 'createdAt' },
+		{ label: 'updatedAt', key: 'updatedAt' },
+		{ label: '__v', key: '__v' },
+	]
+
 	return (
 		<>
 			<ProTable<IUserTable, TSearch>
@@ -138,6 +153,8 @@ const TableUser = () => {
 
 					if (res.data) {
 						setMete(res.data.meta);
+
+						setCurrentDataTable(res.data.result || []);
 					}
 
 					return {
@@ -168,7 +185,7 @@ const TableUser = () => {
 						icon={<ExportOutlined />}
 						type='primary'
 					>
-						Export
+						<CSVLink data={currentDataTable} headers={headerCsvData} filename='user.csv'>Export</CSVLink>
 					</Button>
 					,
 					<Button
