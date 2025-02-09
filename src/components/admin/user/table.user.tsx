@@ -1,7 +1,7 @@
-import { getUsersAPI } from '@/services/api';
+import { deleteUserAPI, getUsersAPI } from '@/services/api';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
-import { Button } from 'antd';
+import { Button, Popconfirm, App } from 'antd';
 import { useRef, useState } from 'react';
 import { EditOutlined, DeleteOutlined, CloudUploadOutlined, PlusOutlined, ExportOutlined } from '@ant-design/icons';
 import { dateRangeValidate } from "@/services/helper";
@@ -12,6 +12,8 @@ import CreateUser from 'components/admin/user/create.user';
 import ImportUser from '@/components/admin/user/data/import.user';
 import { CSVLink } from "react-csv";
 import UpdateUser from './update.user';
+import type { PopconfirmProps } from 'antd';
+import { QuestionCircleOutlined } from '@ant-design/icons';
 
 type TSearch = {
 	fullName: string;
@@ -22,12 +24,19 @@ type TSearch = {
 
 const TableUser = () => {
 	const actionRef = useRef<ActionType>();
+
 	const [meta, setMete] = useState({
 		current: 1,
 		pageSize: 5,
 		pages: 0,
 		total: 0
 	});
+
+	const { message, notification } = App.useApp();
+
+	const refreshTable = () => {
+		actionRef.current?.reload()
+	}
 
 	// View detail
 	const [openViewDetail, setOpenViewDetail] = useState<boolean>(false);
@@ -39,6 +48,35 @@ const TableUser = () => {
 	// Update user
 	const [openModalUpdate, setOpenModalUpdate] = useState<boolean>(false);
 	const [dataUpdateUser, setDataUpdateUser] = useState<IUserTable | null>(null);
+
+	// delete user
+	const [isSubmit, setIsSubmit] = useState<boolean>(false);
+	const [dataDeleteUser, setDataDeleteUser] = useState<IUserTable | null>(null);
+
+	const confirm: PopconfirmProps['onConfirm'] = async () => {
+		setIsSubmit(true);
+		if (dataDeleteUser && dataDeleteUser._id) {
+			const res = await deleteUserAPI(dataDeleteUser._id);
+
+			if (res.data) {
+				message.success('Delete user successfully');
+				refreshTable();
+				setDataDeleteUser(null);
+			} else {
+				notification.error({
+					message: 'Delete user fail',
+					description: res.message
+				})
+			}
+		}
+
+		setIsSubmit(false);
+	};
+
+	const cancel: PopconfirmProps['onCancel'] = (e) => {
+		setDataDeleteUser(null);
+	};
+
 
 	// import user
 	const [openModalImport, setOpenModalImport] = useState<boolean>(false);
@@ -101,6 +139,7 @@ const TableUser = () => {
 			render: (dom, entity, index, action, schema) => {
 				return (
 					<>
+						{/* update user */}
 						<Button
 							style={{ marginRight: '10px', borderColor: 'rgb(231, 112, 13' }}
 							onClick={() => {
@@ -110,7 +149,24 @@ const TableUser = () => {
 						>
 							<EditOutlined style={{ color: 'rgb(231, 112, 13' }} />
 						</Button>
-						<Button style={{ borderColor: '#f5222d' }}><DeleteOutlined style={{ color: '#f5222d' }} /></Button>
+
+						{/* delete user */}
+						<Popconfirm
+							placement="leftTop"
+							title="Delete user"
+							description="Are you sure to delete this user?"
+							onConfirm={confirm}
+							onCancel={cancel}
+							okText="Yes"
+							cancelText="No"
+							icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+							okButtonProps={{ loading: isSubmit }}
+						>
+							<Button style={{ borderColor: '#f5222d' }} onClick={() => setDataDeleteUser(entity)}>
+								<DeleteOutlined style={{ color: '#f5222d' }} />
+							</Button>
+						</Popconfirm>
+
 					</>
 				);
 			}
@@ -240,7 +296,7 @@ const TableUser = () => {
 			<CreateUser
 				openModalCreate={openModalCreate}
 				setOpenModalCreate={setOpenModalCreate}
-				refreshTable={() => { actionRef.current?.reload() }}
+				refreshTable={() => { refreshTable() }}
 			/>
 
 			<UpdateUser
@@ -248,13 +304,13 @@ const TableUser = () => {
 				setOpenModalUpdate={setOpenModalUpdate}
 				dataUpdateUser={dataUpdateUser}
 				setDataUpdateUser={setDataUpdateUser}
-				refreshTable={() => { actionRef.current?.reload() }}
+				refreshTable={() => { refreshTable() }}
 			/>
 
 			<ImportUser
 				openModalImport={openModalImport}
 				setOpenModalImport={setOpenModalImport}
-				refreshTable={() => { actionRef.current?.reload() }}
+				refreshTable={() => { refreshTable() }}
 			/>
 		</>
 	);
