@@ -126,10 +126,12 @@ const TableUser = () => {
 						query += `&sort=${sort.fullName === 'ascend' ? 'fullName' : '-fullName'}`
 					}
 
-					query += `&sort=-createdAt`;
+
 
 					if (sort.createdAt) {
 						query += `&sort=${sort.createdAt === 'ascend' ? 'createdAt' : '-createdAt'}`
+					} else {
+						query += `&sort=-createdAt`;
 					}
 
 					const res = await getUsersAPI(query);

@@ -1,12 +1,12 @@
 import { InboxOutlined } from '@ant-design/icons';
 import type { UploadProps } from 'antd';
-import { Upload } from 'antd';
+import { Upload, Table, App } from 'antd';
 import Modal from 'antd/lib/modal/Modal';
-import { Table, App } from "antd";
 import { useState } from 'react';
 import ExcelJS from "exceljs";
 import { Buffer } from 'buffer';
 import { bulkCreateUserAPI } from '@/services/api';
+import templateFile from 'assets/template/user.xlsx?url';
 
 interface IProps {
 	openModalImport: boolean;
@@ -151,8 +151,16 @@ const ImportUser = (props: IProps) => {
 				</p>
 				<p className="ant-upload-text">Click or drag file to this area to upload</p>
 				<p className="ant-upload-hint">
-					Support for a single or bulk upload. Strictly prohibited from uploading company data or other
-					banned files.
+					Support for a single upload. Only acpept .csv, .xls, .xlsx files or
+					&nbsp;
+					<a
+						download={true}
+						href={templateFile}
+						onClick={e => e.stopPropagation()}
+					>
+						Download Sample File
+					</a>
+
 				</p>
 			</Dragger>
 
