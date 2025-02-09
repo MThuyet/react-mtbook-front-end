@@ -209,6 +209,7 @@ const TableUser = () => {
 			<ImportUser
 				openModalImport={openModalImport}
 				setOpenModalImport={setOpenModalImport}
+				refreshTable={() => { actionRef.current?.reload() }}
 			/>
 		</>
 	);

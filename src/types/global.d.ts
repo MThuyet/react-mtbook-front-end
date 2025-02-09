@@ -55,10 +55,17 @@ declare global {
 		fullName: string;
 		phone: string;
 		role: string;
+		type: string;
 		avatar: string;
 		isActive: boolean;
 		createdAt: Date;
 		updatedAt: Date;
+	}
+
+	interface IBulkCreateUser {
+		countSuccess: number;
+		countError: number;
+		detail: any;
 	}
 
 }
