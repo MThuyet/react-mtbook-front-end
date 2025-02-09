@@ -18,6 +18,7 @@ import { QuestionCircleOutlined } from '@ant-design/icons';
 type TSearch = {
 	fullName: string;
 	email: string;
+	phone: string;
 	createdAt: string;
 	createdAtRange: string;
 }
@@ -197,12 +198,18 @@ const TableUser = () => {
 
 					let query = ``;
 					if (params) {
+
 						query += `current=${params.current}&pageSize=${params.pageSize}`;
+
 						if (params.fullName) {
 							query += `&fullName=/${params.fullName}/i`;
 						}
 						if (params.email) {
 							query += `&email=/${params.email}/i`;
+						}
+
+						if (params.phone) {
+							query += `&phone=/${params.phone}/i`;
 						}
 
 						const createdAtRange = dateRangeValidate(params.createdAtRange);
@@ -214,8 +221,6 @@ const TableUser = () => {
 					if (sort.fullName) {
 						query += `&sort=${sort.fullName === 'ascend' ? 'fullName' : '-fullName'}`
 					}
-
-
 
 					if (sort.createdAt) {
 						query += `&sort=${sort.createdAt === 'ascend' ? 'createdAt' : '-createdAt'}`
