@@ -28,13 +28,13 @@ const CreateUser = (props: IProps) => {
 		setIsSubmit(true)
 		const res = await createUserAPI(fullName, password, email, phone);
 		if (res && res.data) {
-			message.success('Tạo mới user thành công');
+			message.success('Create user successfully');
 			form.resetFields();
 			setOpenModalCreate(false);
 			refreshTable();
 		} else {
 			notification.error({
-				message: 'Đã có lỗi xảy ra',
+				message: 'Create user fail',
 				description: res.message
 			})
 		}
@@ -43,15 +43,15 @@ const CreateUser = (props: IProps) => {
 	return (
 		<>
 			<Modal
-				title="Thêm mới người dùng"
+				title="Add a new user"
 				open={openModalCreate}
 				onOk={() => { form.submit() }}
 				onCancel={() => {
 					setOpenModalCreate(false);
 					form.resetFields();
 				}}
-				okText={"Tạo mới"}
-				cancelText={"Hủy"}
+				okText={"Add new"}
+				cancelText={"Cancel"}
 				confirmLoading={isSubmit}
 			>
 				<Divider />
@@ -64,9 +64,9 @@ const CreateUser = (props: IProps) => {
 				>
 					<Form.Item<FieldType>
 						labelCol={{ span: 24 }}
-						label="Tên hiển thị"
+						label="Full name"
 						name="fullName"
-						rules={[{ required: true, message: 'Vui lòng nhập tên hiển thị!' }]}
+						rules={[{ required: true, message: 'Please input your full name!' }]}
 					>
 						<Input />
 					</Form.Item>
@@ -74,7 +74,7 @@ const CreateUser = (props: IProps) => {
 						labelCol={{ span: 24 }}
 						label="Password"
 						name="password"
-						rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
+						rules={[{ required: true, message: 'Please input your password!' }]}
 					>
 						<Input.Password />
 					</Form.Item>
@@ -83,17 +83,17 @@ const CreateUser = (props: IProps) => {
 						label="Email"
 						name="email"
 						rules={[
-							{ required: true, message: 'Vui lòng nhập email!' },
-							{ type: "email", message: 'Email không đúng định dạng!' },
+							{ required: true, message: 'Please input your email!' },
+							{ type: "email", message: 'Please input a valid email!' },
 						]}
 					>
 						<Input />
 					</Form.Item>
 					<Form.Item<FieldType>
 						labelCol={{ span: 24 }}
-						label="Số điện thoại"
+						label="Phone"
 						name="phone"
-						rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}
+						rules={[{ required: true, message: 'Please input your phone!' }]}
 					>
 						<Input />
 					</Form.Item>

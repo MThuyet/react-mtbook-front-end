@@ -11,6 +11,7 @@ import { FORMATE_DATE_VN } from '@/services/helper';
 import CreateUser from 'components/admin/user/create.user';
 import ImportUser from '@/components/admin/user/data/import.user';
 import { CSVLink } from "react-csv";
+import UpdateUser from './update.user';
 
 type TSearch = {
 	fullName: string;
@@ -34,6 +35,10 @@ const TableUser = () => {
 
 	// Create user
 	const [openModalCreate, setOpenModalCreate] = useState<boolean>(false);
+
+	// Update user
+	const [openModalUpdate, setOpenModalUpdate] = useState<boolean>(false);
+	const [dataUpdateUser, setDataUpdateUser] = useState<IUserTable | null>(null);
 
 	// import user
 	const [openModalImport, setOpenModalImport] = useState<boolean>(false);
@@ -69,6 +74,11 @@ const TableUser = () => {
 			copyable: true,
 		},
 		{
+			title: 'Phone',
+			dataIndex: 'phone',
+			copyable: true,
+		},
+		{
 			title: 'Created at',
 			dataIndex: 'createdAt',
 			sorter: true,
@@ -88,10 +98,18 @@ const TableUser = () => {
 		{
 			title: 'Actions',
 			hideInSearch: true,
-			render: () => {
+			render: (dom, entity, index, action, schema) => {
 				return (
 					<>
-						<Button style={{ marginRight: '10px', borderColor: 'rgb(231, 112, 13' }} ><EditOutlined style={{ color: 'rgb(231, 112, 13' }} /></Button>
+						<Button
+							style={{ marginRight: '10px', borderColor: 'rgb(231, 112, 13' }}
+							onClick={() => {
+								setOpenModalUpdate(true);
+								setDataUpdateUser(entity);
+							}}
+						>
+							<EditOutlined style={{ color: 'rgb(231, 112, 13' }} />
+						</Button>
 						<Button style={{ borderColor: '#f5222d' }}><DeleteOutlined style={{ color: '#f5222d' }} /></Button>
 					</>
 				);
@@ -222,6 +240,14 @@ const TableUser = () => {
 			<CreateUser
 				openModalCreate={openModalCreate}
 				setOpenModalCreate={setOpenModalCreate}
+				refreshTable={() => { actionRef.current?.reload() }}
+			/>
+
+			<UpdateUser
+				openModalUpdate={openModalUpdate}
+				setOpenModalUpdate={setOpenModalUpdate}
+				dataUpdateUser={dataUpdateUser}
+				setDataUpdateUser={setDataUpdateUser}
 				refreshTable={() => { actionRef.current?.reload() }}
 			/>
 
