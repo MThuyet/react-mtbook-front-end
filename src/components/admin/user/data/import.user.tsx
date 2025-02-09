@@ -2,20 +2,29 @@ import { InboxOutlined } from '@ant-design/icons';
 import type { UploadProps } from 'antd';
 import { Upload } from 'antd';
 import Modal from 'antd/lib/modal/Modal';
-import { Table, message } from "antd";
+import { Table, App } from "antd";
+import { useState } from 'react';
+import ExcelJS from "exceljs";
+import { Buffer } from 'buffer';
 
 interface IProps {
 	openModalImport: boolean;
 	setOpenModalImport: (v: boolean) => void;
 }
 
+interface IDataImport {
+	fullName: string;
+	email: string;
+	phone: string;
+}
+
 const { Dragger } = Upload;
-
-
 
 const ImportUser = (props: IProps) => {
 
 	const { setOpenModalImport, openModalImport } = props;
+	const { message, notification } = App.useApp();
+	const [dataImport, setDataImport] = useState<IDataImport[]>([]);
 
 	const propsUpload: UploadProps = {
 		name: 'file',
@@ -32,13 +41,45 @@ const ImportUser = (props: IProps) => {
 			}, 1000);
 		},
 
-		onChange(info) {
+		async onChange(info) {
 			const { status } = info.file;
 			if (status !== 'uploading') {
-				console.log(info.file, info.fileList);
+				console.log('info not uploading', info)
 			}
 			if (status === 'done') {
+				console.log('info file list', info.fileList);
 				message.success(`${info.file.name} file uploaded successfully.`);
+				if (info.fileList && info.fileList.length > 0) {
+					const file = info.fileList[0].originFileObj;
+
+					// load file to buffer
+					const workbook = new ExcelJS.Workbook();
+					const arrayBuffer = await file?.arrayBuffer();
+					const buffer = Buffer.from(arrayBuffer!);
+					await workbook.xlsx.load(buffer);
+
+					// convert to json
+					let jsonData: IDataImport[] = [];
+					workbook.worksheets.forEach(function (sheet) {
+						// read first row as data keys
+						let firstRow = sheet.getRow(1);
+						if (!firstRow.cellCount) return;
+						let keys = firstRow.values as any[];
+						sheet.eachRow((row, rowNumber) => {
+							if (rowNumber == 1) return;
+							let values = row.values as any[];
+							let obj: any = {};
+							for (let i = 1; i < keys.length; i++) {
+								obj[keys[i]] = values[i];
+							}
+							jsonData.push(obj);
+						})
+
+					});
+
+					setDataImport(jsonData);
+					console.log('jsonData', jsonData);
+				}
 			} else if (status === 'error') {
 				message.error(`${info.file.name} file upload failed.`);
 			}
@@ -51,18 +92,21 @@ const ImportUser = (props: IProps) => {
 
 	return (
 		<Modal
+			width={'50vw'}
 			title="Import User"
 			open={openModalImport}
 			onOk={() => { setOpenModalImport(false) }}
 			onCancel={() => {
 				setOpenModalImport(false);
+				setDataImport([]);
 			}}
 			okText={"Import"}
 			cancelText={"Cancel"}
 			maskClosable={false}
 			centered
+			destroyOnClose={true}
 			okButtonProps={{
-				disabled: true
+				disabled: dataImport.length > 0 ? false : true
 			}}
 		>
 			<Dragger {...propsUpload}>
@@ -76,16 +120,19 @@ const ImportUser = (props: IProps) => {
 				</p>
 			</Dragger>
 
-			<Table
-				title={() => <span>Data import:</span>}
-				columns={[
-					{ dataIndex: 'fullName', title: 'Full name' },
-					{ dataIndex: 'email', title: 'Email' },
-					{ dataIndex: 'phone', title: 'Phone' },
-				]}
-			/>
+			<div style={{ paddingTop: 20 }}>
+				<Table
+					title={() => <span>Data import:</span>}
+					dataSource={dataImport}
+					columns={[
+						{ dataIndex: 'fullName', title: 'Full name' },
+						{ dataIndex: 'email', title: 'Email' },
+						{ dataIndex: 'phone', title: 'Phone' },
+					]}
+				/>
+			</div>
 
-		</Modal>
+		</Modal >
 	)
 
 }
