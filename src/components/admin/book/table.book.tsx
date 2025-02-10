@@ -9,6 +9,7 @@ import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { FORMATE_DATE_VN, FORMATE_DATE_DEFAULT, dateRangeValidate } from '@/services/helper';
 import { CSVLink } from "react-csv";
 import { ExportOutlined } from "@ant-design/icons";
+import { DetailBook } from 'components/admin/book/detail.book';
 
 type TSearch = {
 	category: string;
@@ -18,9 +19,11 @@ type TSearch = {
 	createdAtRange: string;
 }
 
-
-
 const TableBook = () => {
+
+	// view detail book
+	const [openViewDetail, setOpenViewDetail] = useState(false);
+	const [dataViewDetail, setDataViewDetail] = useState<IBookTable | null>(null);
 
 	const columns: ProColumns<IBookTable>[] = [
 		{
@@ -32,19 +35,22 @@ const TableBook = () => {
 		{
 			title: 'ID (Click to see detail)',
 			dataIndex: '_id',
-			width: 160,
+			width: 200,
 			ellipsis: true,
 			hideInSearch: true,
 			render(dom, entity, index, action, schema) {
 				return (
-					<a href='#'>{entity._id}</a>
+					<a href='#' onClick={() => { setOpenViewDetail(true); setDataViewDetail(entity) }}>
+						{entity._id}
+					</a>
 				)
 			},
 		},
 		{
 			title: 'Category',
 			dataIndex: 'category',
-			sorter: true
+			sorter: true,
+			width: 150
 		},
 		{
 			title: 'Book name',
@@ -71,10 +77,11 @@ const TableBook = () => {
 			title: 'Price',
 			dataIndex: 'price',
 			sorter: true,
+			width: 100,
 			hideInSearch: true,
 			render(dom, entity, index, action, schema) {
 				return (
-					`${entity.price} VND`
+					`${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(entity?.price)}`
 				)
 			}
 		},
@@ -260,6 +267,13 @@ const TableBook = () => {
 					</Button>
 
 				]}
+			/>
+
+			<DetailBook
+				openViewDetail={openViewDetail}
+				dataViewDetail={dataViewDetail}
+				setOpenViewDetail={setOpenViewDetail}
+				setDataViewDetail={setDataViewDetail}
 			/>
 		</>
 	);
