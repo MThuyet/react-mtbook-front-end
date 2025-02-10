@@ -7,7 +7,7 @@ import { EditOutlined, DeleteOutlined, CloudUploadOutlined, PlusOutlined, Export
 import { dateRangeValidate } from "@/services/helper";
 import { DetailUser } from 'components/admin/user/detail.user';
 import dayjs from 'dayjs';
-import { FORMATE_DATE_VN } from '@/services/helper';
+import { FORMATE_DATE_VN, FORMATE_DATE_DEFAULT } from '@/services/helper';
 import CreateUser from 'components/admin/user/create.user';
 import ImportUser from '@/components/admin/user/data/import.user';
 import { CSVLink } from "react-csv";
@@ -124,7 +124,7 @@ const TableUser = () => {
 			hideInSearch: true,
 			render(dom, entity, index, action, schema) {
 				return (
-					<>{dayjs(entity.createdAt).format(FORMATE_DATE_VN)}</>
+					<>{dayjs(entity.createdAt).format(FORMATE_DATE_DEFAULT)}</>
 				)
 			},
 		},
@@ -232,7 +232,6 @@ const TableUser = () => {
 
 					if (res.data) {
 						setMete(res.data.meta);
-
 						setCurrentDataTable(res.data.result || []);
 					}
 
