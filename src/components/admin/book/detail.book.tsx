@@ -1,12 +1,12 @@
-import { Drawer, Descriptions, Divider } from 'antd'
+import { Drawer, Descriptions, Divider, Badge } from 'antd'
 import dayjs from 'dayjs';
 import { FORMATE_DATE_DEFAULT, FORMATE_DATE_VN } from '@/services/helper';
 import { Image, Upload } from 'antd';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { GetProp, UploadFile, UploadProps } from "antd";
+import { v4 as uuidv4 } from 'uuid';
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
-
 interface IProps {
 	openViewDetail: boolean;
 	dataViewDetail: IBookTable | null;
@@ -21,32 +21,7 @@ export const DetailBook = (props: IProps) => {
 	const [previewOpen, setPreviewOpen] = useState(false);
 	const [previewImage, setPreviewImage] = useState("");
 
-	const [fileList, setFileList] = useState<UploadFile[]>([
-		{
-			uid: "-1",
-			name: "image.png",
-			status: "done",
-			url: "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png",
-		},
-		{
-			uid: "-2",
-			name: "image.png",
-			status: "done",
-			url: "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png",
-		},
-		{
-			uid: "-3",
-			name: "image.png",
-			status: "done",
-			url: "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png",
-		},
-		{
-			uid: "-4",
-			name: "image.png",
-			status: "done",
-			url: "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png",
-		},
-	]);
+	const [fileList, setFileList] = useState<UploadFile[]>([]);
 
 	const getBase64 = (file: FileType): Promise<string> =>
 		new Promise((resolve, reject) => {
@@ -60,18 +35,37 @@ export const DetailBook = (props: IProps) => {
 		if (!file.url && !file.preview) {
 			file.preview = await getBase64(file.originFileObj as FileType);
 		}
-
 		setPreviewImage(file.url || (file.preview as string));
 		setPreviewOpen(true);
 	};
 
-	const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) => setFileList(newFileList);
+	const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) => {
+		setFileList(newFileList);
+	};
 
 	// close modal
 	const onClose = () => {
 		setOpenViewDetail(false);
 		setDataViewDetail(null);
+		setFileList([]);
 	}
+
+	useEffect(() => {
+		if (dataViewDetail) {
+			let arrImage = [dataViewDetail?.thumbnail, ...dataViewDetail?.slider || []];
+
+			let listImage: UploadFile[] = arrImage.map((item) => {
+				return {
+					uid: uuidv4() || '',
+					name: item || '',
+					status: 'done',
+					url: `${import.meta.env.VITE_BACKEND_URL}/images/book/${item}` || '',
+				}
+			})
+
+			setFileList(listImage);
+		}
+	}, [dataViewDetail])
 
 	return (
 		<Drawer
@@ -90,7 +84,9 @@ export const DetailBook = (props: IProps) => {
 
 			<Descriptions title="Book info detail" bordered column={2}>
 				<Descriptions.Item label="ID">{dataViewDetail?._id}</Descriptions.Item>
-				<Descriptions.Item label="Category">{dataViewDetail?.category}</Descriptions.Item>
+				<Descriptions.Item label="Category">
+					<Badge status="processing" text={dataViewDetail?.category} />
+				</Descriptions.Item>
 				<Descriptions.Item label="Book name" span={2}>{dataViewDetail?.mainText}</Descriptions.Item>
 				<Descriptions.Item label="Author">{dataViewDetail?.author}</Descriptions.Item>
 				<Descriptions.Item label="Price">
@@ -109,7 +105,7 @@ export const DetailBook = (props: IProps) => {
 			<Divider orientation='left' >Book Images</Divider>
 
 			<Upload
-				action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
+				action={`${import.meta.env.VITE_BACKEND_URL}/upload/book`}
 				listType="picture-card"
 				fileList={fileList}
 				onPreview={handlePreview}
