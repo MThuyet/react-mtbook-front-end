@@ -1,17 +1,19 @@
 import { ProTable } from '@ant-design/pro-components';
-import { Button, message } from 'antd';
+import { Button, message, notification } from 'antd';
 import { useRef, useState } from 'react';
 import { DeleteTwoTone, EditTwoTone, PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
-import { getBooksAPI } from '@/services/api';
+import { deleteBookAPI, getBooksAPI } from '@/services/api';
 import dayjs from 'dayjs';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { FORMATE_DATE_VN, FORMATE_DATE_DEFAULT, dateRangeValidate } from '@/services/helper';
 import { CSVLink } from "react-csv";
 import { ExportOutlined } from "@ant-design/icons";
-import { DetailBook } from 'components/admin/book/detail.book';
+import { DetailBook } from './detail.book';
 import { CreateBook } from './create.book';
 import { UpdateBook } from './update.book';
+import { Popconfirm } from "antd";
+import type { PopconfirmProps } from "antd";
 
 type TSearch = {
 	category: string;
@@ -37,6 +39,34 @@ const TableBook = () => {
 	// update book
 	const [openModalUpdate, setOpenModalUpdate] = useState(false);
 	const [dataUpdateBook, setDataUpdateBook] = useState<IBookTable | null>(null);
+
+	// delete book
+	const [isSubmit, setIsSubmit] = useState(false);
+	const [dataDeleteBook, setDataDeleteBook] = useState<IBookTable | null>(null);
+
+	const confirmDelete: PopconfirmProps['onConfirm'] = async () => {
+		setIsSubmit(true);
+		if (dataDeleteBook && dataDeleteBook._id) {
+			const res = await deleteBookAPI(dataDeleteBook._id);
+
+			if (res.data) {
+				message.success('Delete user successfully');
+				refreshTable();
+				setDataDeleteBook(null);
+			} else {
+				notification.error({
+					message: 'Delete user fail',
+					description: res.message
+				})
+			}
+		}
+
+		setIsSubmit(false);
+	};
+
+	const cancelDelete: PopconfirmProps['onCancel'] = (e) => {
+		setDataDeleteBook(null);
+	};
 
 	const columns: ProColumns<IBookTable>[] = [
 		{
@@ -137,9 +167,22 @@ const TableBook = () => {
 							<EditOutlined style={{ color: 'rgb(231, 112, 13' }} />
 						</Button>
 
-						<Button style={{ borderColor: '#f5222d' }}>
-							<DeleteOutlined style={{ color: '#f5222d' }} />
-						</Button>
+						{/* Delete book */}
+						<Popconfirm
+							placement="leftTop"
+							title="Delete book"
+							description="Are you sure to delete this book?"
+							onConfirm={confirmDelete}
+							onCancel={cancelDelete}
+							okText="Yes"
+							cancelText="No"
+							icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+							okButtonProps={{ loading: isSubmit }}
+						>
+							<Button style={{ borderColor: '#f5222d' }} onClick={() => setDataDeleteBook(entity)}>
+								<DeleteOutlined style={{ color: '#f5222d' }} />
+							</Button>
+						</Popconfirm>
 					</div>
 
 				)
@@ -221,26 +264,26 @@ const TableBook = () => {
 					}
 
 					if (sort) {
-						query += `&sort=`;
 						if (sort.price) {
-							query += `${sort.price === 'ascend' ? 'price' : '-price'}`;
+							query += `&sort=${sort.price === 'ascend' ? 'price' : '-price'}`;
 						}
 
 						if (sort.category) {
-							query += `${sort.category === 'ascend' ? 'category' : '-category'}`;
+							query += `&sort=${sort.category === 'ascend' ? 'category' : '-category'}`;
 						}
 
 						if (sort.author) {
-							query += `${sort.author === 'ascend' ? 'author' : '-author'}`
+							query += `&sort=${sort.author === 'ascend' ? 'author' : '-author'}`
 						}
 
 						if (sort.mainText) {
-							query += `${sort.mainText === 'ascend' ? 'mainText' : '-mainText'}`
+							query += `&sort=${sort.mainText === 'ascend' ? 'mainText' : '-mainText'}`
 						}
 
-						query += '-createdAt'
 						if (sort.createdAt) {
-							query += `${sort.createdAt === 'ascend' ? 'createdAt' : '-createdAt'}`
+							query += `&sort=${sort.createdAt === 'ascend' ? 'createdAt' : '-createdAt'}`
+						} else {
+							query += `&sort=-createdAt`
 						}
 					}
 
