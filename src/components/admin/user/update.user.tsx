@@ -49,7 +49,6 @@ const UpdateUser = (props: IProps) => {
 
 	useEffect(() => {
 		if (dataUpdateUser) {
-			console.log('dataUpdateUser', dataUpdateUser);
 			form.setFieldsValue(dataUpdateUser)
 		}
 	}, [form, dataUpdateUser]);

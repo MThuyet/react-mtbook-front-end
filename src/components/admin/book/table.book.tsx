@@ -11,6 +11,7 @@ import { CSVLink } from "react-csv";
 import { ExportOutlined } from "@ant-design/icons";
 import { DetailBook } from 'components/admin/book/detail.book';
 import { CreateBook } from './create.book';
+import { UpdateBook } from './update.book';
 
 type TSearch = {
 	category: string;
@@ -22,15 +23,20 @@ type TSearch = {
 
 const TableBook = () => {
 
+	const refreshTable = () => {
+		actionRef.current?.reload();
+	}
+
 	// view detail book
 	const [openViewDetail, setOpenViewDetail] = useState(false);
 	const [dataViewDetail, setDataViewDetail] = useState<IBookTable | null>(null);
 
 	// create book
 	const [openModalCreate, setOpenModalCreate] = useState(false);
-	const refreshTable = () => {
-		actionRef.current?.reload();
-	}
+
+	// update book
+	const [openModalUpdate, setOpenModalUpdate] = useState(false);
+	const [dataUpdateBook, setDataUpdateBook] = useState<IBookTable | null>(null);
 
 	const columns: ProColumns<IBookTable>[] = [
 		{
@@ -122,6 +128,10 @@ const TableBook = () => {
 				return (
 					<div style={{ maxWidth: '110px' }}>
 						<Button
+							onClick={() => {
+								setOpenModalUpdate(true);
+								setDataUpdateBook(entity);
+							}}
 							style={{ marginRight: '10px', borderColor: 'rgb(231, 112, 13' }}
 						>
 							<EditOutlined style={{ color: 'rgb(231, 112, 13' }} />
@@ -293,6 +303,15 @@ const TableBook = () => {
 				openModalCreate={openModalCreate}
 				setOpenModalCreate={setOpenModalCreate}
 				refreshTable={refreshTable}
+			/>
+
+
+			<UpdateBook
+				openModalUpdate={openModalUpdate}
+				setOpenModalUpdate={setOpenModalUpdate}
+				refreshTable={refreshTable}
+				dataUpdateBook={dataUpdateBook}
+				setDataUpdateBook={setDataUpdateBook}
 			/>
 		</>
 	);
