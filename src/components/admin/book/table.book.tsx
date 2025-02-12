@@ -10,6 +10,7 @@ import { FORMATE_DATE_VN, FORMATE_DATE_DEFAULT, dateRangeValidate } from '@/serv
 import { CSVLink } from "react-csv";
 import { ExportOutlined } from "@ant-design/icons";
 import { DetailBook } from 'components/admin/book/detail.book';
+import { CreateBook } from './create.book';
 
 type TSearch = {
 	category: string;
@@ -25,12 +26,20 @@ const TableBook = () => {
 	const [openViewDetail, setOpenViewDetail] = useState(false);
 	const [dataViewDetail, setDataViewDetail] = useState<IBookTable | null>(null);
 
+	// create book
+	const [openModalCreate, setOpenModalCreate] = useState(false);
+
 	const columns: ProColumns<IBookTable>[] = [
 		{
 			title: '#',
 			dataIndex: 'index',
-			valueType: 'indexBorder',
 			width: 48,
+			hideInSearch: true,
+			render(dom, entity, index, action, schema) {
+				return (
+					<div style={{ fontWeight: 'bold' }}>{index + 1 + ((meta.pageSize) * meta.current) - meta.pageSize}</div>
+				)
+			},
 		},
 		{
 			title: 'ID (Click to see detail)',
@@ -259,7 +268,7 @@ const TableBook = () => {
 						key="button"
 						icon={<PlusOutlined />}
 						onClick={() => {
-							actionRef.current?.reload();
+							setOpenModalCreate(true);
 						}}
 						type="primary"
 					>
@@ -274,6 +283,11 @@ const TableBook = () => {
 				dataViewDetail={dataViewDetail}
 				setOpenViewDetail={setOpenViewDetail}
 				setDataViewDetail={setDataViewDetail}
+			/>
+
+			<CreateBook
+				openModalCreate={openModalCreate}
+				setOpenModalCreate={setOpenModalCreate}
 			/>
 		</>
 	);
