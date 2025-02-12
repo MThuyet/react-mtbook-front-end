@@ -6,7 +6,7 @@ import {
 } from 'antd';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import type { FormProps } from 'antd';
-import { uploadFileAPI, getCategoryAPI } from '@/services/api';
+import { uploadFileAPI, getCategoryAPI, createBookAPI } from '@/services/api';
 import type { GetProp, UploadFile, UploadProps } from 'antd';
 import { MAX_UPLOAD_IMAGE_SIZE } from '@/services/helper';
 import { UploadChangeParam } from 'antd/es/upload';
@@ -19,21 +19,22 @@ type UserUploadType = 'thumbnail' | 'slider';
 interface IProps {
 	openModalCreate: boolean;
 	setOpenModalCreate: (v: boolean) => void;
+	refreshTable: () => void
 }
 
 type FieldType = {
+	thumbnail: any;
+	slider: any;
 	mainText: string;
 	author: string;
 	price: number;
-	category: string;
 	quantity: number;
-	thumbnail: any;
-	slider: any;
+	category: string;
 };
 
 export const CreateBook = (props: IProps) => {
 
-	const { openModalCreate, setOpenModalCreate } = props;
+	const { openModalCreate, setOpenModalCreate, refreshTable } = props;
 	const { message, notification } = App.useApp();
 	const [form] = Form.useForm();
 	const [isSubmit, setIsSubmit] = useState(false);
@@ -67,9 +68,30 @@ export const CreateBook = (props: IProps) => {
 	const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
 		setIsSubmit(true)
 
-		console.log('value form: ', values, fileListThumbnail, fileListSlider);
-		console.log('value fileListThumbnail: ', fileListThumbnail);
-		console.log('value fileListSlider: ', fileListSlider);
+		let convertThumbnail = fileListThumbnail[0].name ?? '';
+		let convertSlider = fileListSlider.map((item: any) => {
+			return item.name ?? [];
+		});
+
+		values.thumbnail = convertThumbnail;
+		values.slider = convertSlider
+
+
+		const res = await createBookAPI(values);
+
+		if (res.data) {
+			message.success('Create book successfully');
+			form.resetFields();
+			setOpenModalCreate(false);
+			refreshTable();
+			setFileListThumbnail([]);
+			setFileListSlider([]);
+		} else {
+			notification.error({
+				message: 'Create book fail',
+				description: res.message
+			})
+		}
 
 		setIsSubmit(false)
 	};
@@ -152,12 +174,9 @@ export const CreateBook = (props: IProps) => {
 		} else {
 			message.error(res.message);
 		}
-
-
 	}
 
 	const normFile = (e: any) => {
-		console.log('Upload event:', e);
 		if (Array.isArray(e)) {
 			return e;
 		}

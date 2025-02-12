@@ -28,6 +28,9 @@ const TableBook = () => {
 
 	// create book
 	const [openModalCreate, setOpenModalCreate] = useState(false);
+	const refreshTable = () => {
+		actionRef.current?.reload();
+	}
 
 	const columns: ProColumns<IBookTable>[] = [
 		{
@@ -225,6 +228,7 @@ const TableBook = () => {
 							query += `${sort.mainText === 'ascend' ? 'mainText' : '-mainText'}`
 						}
 
+						query += '-createdAt'
 						if (sort.createdAt) {
 							query += `${sort.createdAt === 'ascend' ? 'createdAt' : '-createdAt'}`
 						}
@@ -288,6 +292,7 @@ const TableBook = () => {
 			<CreateBook
 				openModalCreate={openModalCreate}
 				setOpenModalCreate={setOpenModalCreate}
+				refreshTable={refreshTable}
 			/>
 		</>
 	);
