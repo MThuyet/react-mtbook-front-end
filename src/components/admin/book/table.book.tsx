@@ -314,13 +314,16 @@ const TableBook = () => {
 				}
 				headerTitle="Table Book"
 				toolBarRender={() => [
-					<Button
-						key="export"
-						icon={<ExportOutlined />}
-						type='primary'
-					>
-						<CSVLink data={currentDataTable} headers={headerCsvData} filename='books.csv'>Export</CSVLink>
-					</Button>,
+
+					<CSVLink data={currentDataTable} headers={headerCsvData} filename='books.csv'>
+						<Button
+							key="export"
+							icon={<ExportOutlined />}
+							type='primary'
+						>Export
+						</Button>
+					</CSVLink>,
+
 					<Button
 						key="button"
 						icon={<PlusOutlined />}
