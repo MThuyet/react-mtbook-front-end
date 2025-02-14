@@ -5,6 +5,7 @@ import 'styles/home.scss';
 import { useState, useEffect } from 'react';
 import { getBooksAPI, getCategoryAPI } from '@/services/api';
 import { notification, Spin } from 'antd';
+import { useNavigate } from 'react-router-dom';
 
 type FieldType = {
 	range: {
@@ -15,66 +16,14 @@ type FieldType = {
 };
 
 const HomePage = () => {
+	// redirec to detail book
+	const navigate = useNavigate();
+	const handleViewDetailBook = (id: string) => {
+		navigate(`/book/${id}`);
+	}
 
 	// custom loading
 	const [isLoading, setIsLoading] = useState<boolean>(false);
-
-	const [form] = Form.useForm();
-
-	const handleChangeFilter = (changedValues: any, values: any) => {
-		if (changedValues.category) {
-			const cate = values.category;
-			if (cate && cate.length > 0) {
-				const f = cate.join(',');
-				setFilter(`category=${f}`);
-				setCurrent(1);
-			} else {
-				setFilter('');
-			}
-		}
-	}
-
-	const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
-
-		if (values.range.from >= 0 && values.range.to >= values.range.from) {
-			let f = `price>=${values.range.from}&price<=${values.range.to}`;
-			if (values.category && values.category.length > 0) {
-				const cate = values?.category?.join(',');
-				f += `&category=${cate}`;
-			}
-			setFilter(f);
-			setCurrent(1);
-		} else {
-			message.error('Vui lòng nhập khoảng giá hợp lý!');
-		}
-	}
-
-	const onChange = (key: string) => {
-		console.log(key);
-	};
-
-	const items = [
-		{
-			key: '&sort=-sold',
-			label: `Phổ biến`,
-			children: <></>,
-		},
-		{
-			key: '&sort=-createdAt',
-			label: `Hàng Mới`,
-			children: <></>,
-		},
-		{
-			key: '&sort=price',
-			label: `Giá Thấp Đến Cao`,
-			children: <></>,
-		},
-		{
-			key: '&sort=-price',
-			label: `Giá Cao Đến Thấp`,
-			children: <></>,
-		},
-	];
 
 	// get category
 	const [listCategory, setListCategory] = useState<{
@@ -108,6 +57,19 @@ const HomePage = () => {
 	const [current, setCurrent] = useState<number>(1);
 	const [pageSize, setPageSize] = useState<number>(5);
 
+	// pagination
+	const handleOnChangePage = (pagination: { current: number, pageSize: number }) => {
+		// nếu trang click khác trang hiện tại thì mới set
+		if (pagination && pagination.current !== current) {
+			setCurrent(pagination.current);
+		}
+		if (pagination && pagination.pageSize !== pageSize) {
+			setPageSize(pagination.pageSize)
+			setCurrent(1);
+		}
+	}
+
+	// fetch book
 	const fetchBook = async () => {
 		setIsLoading(true);
 
@@ -134,20 +96,62 @@ const HomePage = () => {
 	const [filter, setFilter] = useState<string>('');
 	const [sortQuery, setSortQuery] = useState<string>('&sort=-sold');
 
+	const items = [
+		{
+			key: '&sort=-sold',
+			label: `Phổ biến`,
+			children: <></>,
+		},
+		{
+			key: '&sort=-createdAt',
+			label: `Hàng Mới`,
+			children: <></>,
+		},
+		{
+			key: '&sort=price',
+			label: `Giá Thấp Đến Cao`,
+			children: <></>,
+		},
+		{
+			key: '&sort=-price',
+			label: `Giá Cao Đến Thấp`,
+			children: <></>,
+		},
+	];
+
+	const handleChangeFilter = (changedValues: any, values: any) => {
+		if (changedValues.category) {
+			const cate = values.category;
+			if (cate && cate.length > 0) {
+				const f = cate.join(',');
+				setFilter(`category=${f}`);
+				setCurrent(1);
+			} else {
+				setFilter('');
+			}
+		}
+	};
+
+	// submit form
+	const [form] = Form.useForm();
+	const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
+
+		if (values.range.from >= 0 && values.range.to >= values.range.from) {
+			let f = `price>=${values.range.from}&price<=${values.range.to}`;
+			if (values.category && values.category.length > 0) {
+				const cate = values?.category?.join(',');
+				f += `&category=${cate}`;
+			}
+			setFilter(f);
+			setCurrent(1);
+		} else {
+			message.error('Vui lòng nhập khoảng giá hợp lý!');
+		}
+	}
+
 	useEffect(() => {
 		fetchBook();
 	}, [current, pageSize, filter, sortQuery])
-
-	const handleOnChangePage = (pagination: { current: number, pageSize: number }) => {
-		// nếu trang click khác trang hiện tại thì mới set
-		if (pagination && pagination.current !== current) {
-			setCurrent(pagination.current);
-		}
-		if (pagination && pagination.pageSize !== pageSize) {
-			setPageSize(pagination.pageSize)
-			setCurrent(1);
-		}
-	}
 
 	return (
 		<div style={{ background: '#efefef', padding: '20px 0' }}>
@@ -286,7 +290,7 @@ const HomePage = () => {
 									{listBook?.map((item, index) => {
 										return (
 											<div className="column" key={`book-${index}`}>
-												<div className='wrapper'>
+												<div className='wrapper' onClick={() => handleViewDetailBook(item._id)}>
 													<div className='thumbnail'>
 														<img
 															src={`${import.meta.env.VITE_BACKEND_URL}/images/book/${item?.thumbnail}`}

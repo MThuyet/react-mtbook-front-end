@@ -32,7 +32,7 @@ const router = createBrowserRouter([
 				element: <HomePage />
 			},
 			{
-				path: "/book",
+				path: "/book/:id",
 				element: <BookPage />,
 			},
 			{
@@ -112,7 +112,6 @@ createRoot(document.getElementById('root')!).render(
 		<App>
 			<AppProvider>
 				<ConfigProvider locale={enUS}> <RouterProvider router={router} /></ConfigProvider>
-
 			</AppProvider>
 		</App>
 	</StrictMode>,

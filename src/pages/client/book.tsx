@@ -1,6 +1,13 @@
+import BookDetail from "@/components/client/book/book.detail"
+import { useParams } from "react-router-dom"
+
 const BookPage = () => {
+	let { id } = useParams();
+
 	return (
-		<div>Book Page</div>
+		<div>
+			<BookDetail />
+		</div>
 	)
 }
 
