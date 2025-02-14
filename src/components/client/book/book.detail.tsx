@@ -5,54 +5,40 @@ import { Rate, InputNumber, Image, Carousel } from 'antd';
 import { ShoppingCartOutlined } from '@ant-design/icons';
 import { useParams, } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-
-const images = [
-	{
-		original: 'https://picsum.photos/id/1018/1000/600/',
-		thumbnail: 'https://picsum.photos/id/1018/250/150/',
-		originalClass: "original-image",
-		thumbnailClass: "thumbnail-image"
-	},
-	{
-		original: 'https://picsum.photos/id/1015/1000/600/',
-		thumbnail: 'https://picsum.photos/id/1015/250/150/',
-		originalClass: "original-image",
-		thumbnailClass: "thumbnail-image"
-	},
-	{
-		original: 'https://picsum.photos/id/1019/1000/600/',
-		thumbnail: 'https://picsum.photos/id/1019/250/150/',
-		originalClass: "original-image",
-		thumbnailClass: "thumbnail-image"
-	},
-	{
-		original: 'https://picsum.photos/id/1018/1000/600/',
-		thumbnail: 'https://picsum.photos/id/1018/250/150/',
-		originalClass: "original-image",
-		thumbnailClass: "thumbnail-image"
-	},
-	{
-		original: 'https://picsum.photos/id/1015/1000/600/',
-		thumbnail: 'https://picsum.photos/id/1015/250/150/',
-		originalClass: "original-image",
-		thumbnailClass: "thumbnail-image"
-	},
-	{
-		original: 'https://picsum.photos/id/1019/1000/600/',
-		thumbnail: 'https://picsum.photos/id/1019/250/150/',
-		originalClass: "original-image",
-		thumbnailClass: "thumbnail-image"
-	},
-	{
-		original: 'https://picsum.photos/id/1018/1000/600/',
-		thumbnail: 'https://picsum.photos/id/1018/250/150/',
-		originalClass: "original-image",
-		thumbnailClass: "thumbnail-image"
-	},
-];
+import { getBookDetailAPI } from "services/api";
 
 const BookDetail = () => {
 	const { id } = useParams();
+	const [dataBook, setDataBook] = useState<IBookTable | null>(null);
+	const [images, setImages] = useState<
+		{
+			original: string,
+			thumbnail: string,
+			originalClass: string,
+			thumbnailClass: string
+		}[]
+	>([]);
+
+	useEffect(() => {
+		const fetchBookDetail = async () => {
+			const res = await getBookDetailAPI(id as string);
+			if (res.data) {
+				let arrImage = [res.data.thumbnail, ...res.data.slider];
+				let b = arrImage.map(item => {
+					return {
+						original: `${import.meta.env.VITE_BACKEND_URL}/images/book/${item}`,
+						thumbnail: `${import.meta.env.VITE_BACKEND_URL}/images/book/${item}`,
+						originalClass: "original-image",
+						thumbnailClass: "thumbnail-image"
+					}
+				})
+				setImages(b);
+				setDataBook(res.data);
+			}
+		}
+
+		fetchBookDetail();
+	}, [id])
 
 	return (
 		<>
@@ -63,6 +49,8 @@ const BookDetail = () => {
 							{/* show list image */}
 							<Col md={10} xs={0}>
 								<ImageGallery
+									thumbnailPosition="left"
+									disableThumbnailScroll={true}
 									items={images}
 									showFullscreenButton={false}
 									showPlayButton={false}
@@ -97,10 +85,10 @@ const BookDetail = () => {
 									<div className="content">
 										<div className="author">
 											<span>Tác giả:</span>
-											<a href="#">Mờ Thuyết</a>
+											<a href="#">{dataBook?.author}</a>
 										</div>
 
-										<div className="name">How Psychology Works - Hiểu Hết Về Tâm Lý Học</div>
+										<div className="name">{dataBook?.mainText}</div>
 
 										<div className="description">
 											Mỗi quyển sách là một kho tàng tri thức vô giá, không chỉ lưu giữ những câu chuyện, ý tưởng và bài học quý báu mà còn mở ra cánh cửa dẫn đến những thế giới mới lạ, giúp con người hiểu sâu hơn về chính mình và cuộc sống xung quanh. Dù là những trang sách về lịch sử, khoa học, văn học hay triết học, mỗi cuốn sách đều mang trong mình sức mạnh thay đổi tư duy, nuôi dưỡng tâm hồn và truyền cảm hứng cho những hành trình khám phá vô tận của con người.
@@ -108,11 +96,11 @@ const BookDetail = () => {
 
 										<div className="rate">
 											<Rate disabled defaultValue={5} style={{ fontSize: 16 }} />
-											<span style={{ color: '#80868b' }}>Đã bán 29</span>
+											<span style={{ color: '#80868b' }}>Đã bán {dataBook?.sold}</span>
 										</div>
 
 										<div className="price">
-											{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(79000)}
+											{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(dataBook?.price ?? 0)}
 										</div>
 
 										<div className="delivery" style={{ marginBottom: '10px' }}>
