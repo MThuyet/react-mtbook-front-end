@@ -88,14 +88,18 @@ const AppHeader = (props: any) => {
 			</div>
 		)
 	}
+
 	return (
 		<>
 			<div className='header-container'>
 				<header className="page-header">
 					<div className="page-header__top">
-						<div className="page-header__toggle" onClick={() => {
-							setOpenDrawer(true)
-						}}>☰</div>
+						<div className="page-header__toggle"
+							onClick={() => {
+								setOpenDrawer(true)
+							}}>
+							☰
+						</div>
 						<div className='page-header__logo'>
 							<span className='logo'>
 								<span onClick={() => navigate('/')}> <FaReact className='rotate icon-react' />Mờ Thuyết</span>
@@ -148,11 +152,13 @@ const AppHeader = (props: any) => {
 					</nav>
 				</header>
 			</div>
+
 			<Drawer
 				title="Menu chức năng"
 				placement="left"
 				onClose={() => setOpenDrawer(false)}
 				open={openDrawer}
+				width={'70vw'}
 			>
 				<p>Quản lý tài khoản</p>
 				<Divider />

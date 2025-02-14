@@ -1,6 +1,331 @@
+import { FilterTwoTone, ReloadOutlined } from '@ant-design/icons';
+import { Row, Col, Form, Checkbox, Divider, InputNumber, Button, Rate, Tabs, Pagination, message } from 'antd';
+import type { FormProps } from 'antd';
+import 'styles/home.scss';
+import { useState, useEffect } from 'react';
+import { getBooksAPI, getCategoryAPI } from '@/services/api';
+import { notification, Spin } from 'antd';
+
+type FieldType = {
+	range: {
+		from: number;
+		to: number
+	}
+	category: string[]
+};
+
 const HomePage = () => {
+
+	// custom loading
+	const [isLoading, setIsLoading] = useState<boolean>(false);
+
+	const [form] = Form.useForm();
+
+	const handleChangeFilter = (changedValues: any, values: any) => {
+		if (changedValues.category) {
+			const cate = values.category;
+			if (cate && cate.length > 0) {
+				const f = cate.join(',');
+				setFilter(`category=${f}`);
+				setCurrent(1);
+			} else {
+				setFilter('');
+			}
+		}
+	}
+
+	const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
+
+		if (values.range.from >= 0 && values.range.to >= values.range.from) {
+			let f = `price>=${values.range.from}&price<=${values.range.to}`;
+			if (values.category && values.category.length > 0) {
+				const cate = values?.category?.join(',');
+				f += `&category=${cate}`;
+			}
+			setFilter(f);
+			setCurrent(1);
+		} else {
+			message.error('Vui lòng nhập khoảng giá hợp lý!');
+		}
+	}
+
+	const onChange = (key: string) => {
+		console.log(key);
+	};
+
+	const items = [
+		{
+			key: '&sort=-sold',
+			label: `Phổ biến`,
+			children: <></>,
+		},
+		{
+			key: '&sort=-createdAt',
+			label: `Hàng Mới`,
+			children: <></>,
+		},
+		{
+			key: '&sort=price',
+			label: `Giá Thấp Đến Cao`,
+			children: <></>,
+		},
+		{
+			key: '&sort=-price',
+			label: `Giá Cao Đến Thấp`,
+			children: <></>,
+		},
+	];
+
+	// get category
+	const [listCategory, setListCategory] = useState<{
+		label: string;
+		value: string
+	}[]>([]);
+
+	useEffect(() => {
+		const fetchCategory = async () => {
+			const res = await getCategoryAPI();
+
+			if (res && res.data) {
+				const c = res.data.map(item => {
+					return { label: item, value: item }
+				})
+				setListCategory(c);
+			} else {
+				notification.error({
+					message: 'Lỗi khi lấy danh mục!',
+					description: res.message
+				})
+			}
+		}
+
+		fetchCategory();
+	}, [])
+
+	// get list book
+	const [listBook, setListBook] = useState<IBookTable[]>([]);
+	const [total, setTotal] = useState<number>(0);
+	const [current, setCurrent] = useState<number>(1);
+	const [pageSize, setPageSize] = useState<number>(5);
+
+	const fetchBook = async () => {
+		setIsLoading(true);
+
+		let query = `current=${current}&pageSize=${pageSize}`;
+
+		if (filter && filter !== '') {
+			query += `&${filter}`;
+		};
+		if (sortQuery) {
+			query += `${sortQuery}`;
+		}
+
+		const res = await getBooksAPI(query);
+
+		if (res && res.data) {
+			setListBook(res.data.result);
+			setTotal(res.data.meta.total);
+		}
+
+		setIsLoading(false);
+	}
+
+	// filter, sort
+	const [filter, setFilter] = useState<string>('');
+	const [sortQuery, setSortQuery] = useState<string>('&sort=-sold');
+
+	useEffect(() => {
+		fetchBook();
+	}, [current, pageSize, filter, sortQuery])
+
+	const handleOnChangePage = (pagination: { current: number, pageSize: number }) => {
+		// nếu trang click khác trang hiện tại thì mới set
+		if (pagination && pagination.current !== current) {
+			setCurrent(pagination.current);
+		}
+		if (pagination && pagination.pageSize !== pageSize) {
+			setPageSize(pagination.pageSize)
+			setCurrent(1);
+		}
+	}
+
 	return (
-		<div>Home Page</div>
+		<div style={{ background: '#efefef', padding: '20px 0' }}>
+			<div className="homepage-container" style={{ maxWidth: 1440, margin: '0 auto' }}>
+				<Row gutter={[20, 20]}>
+					{/* sidebar */}
+					<Col lg={4} md={6} sm={0} xs={0}>
+						<div style={{ padding: "20px", background: '#fff', borderRadius: 5 }}>
+							<div style={{ display: 'flex', justifyContent: "space-between" }}>
+								<span>
+									<FilterTwoTone />
+									<span style={{ fontWeight: 500 }}>Bộ lọc tìm kiếm</span>
+								</span>
+								<ReloadOutlined title="Reset" onClick={() => { setFilter(''); form.resetFields() }} />
+							</div>
+
+							<Divider />
+
+							<Form
+								onFinish={onFinish}
+								form={form}
+								onValuesChange={(changedValues, values) => { handleChangeFilter(changedValues, values) }}
+							>
+								<Form.Item
+									name="category"
+									label="Danh mục sản phẩm"
+									labelCol={{ span: 24 }}
+								>
+									<Checkbox.Group >
+										<Row>
+											{listCategory && listCategory.length > 0
+												?
+												(listCategory.map((item, index) => {
+													return (
+														<Col span={24} key={`category-${index}`} style={{ padding: '7px 0' }}>
+															<Checkbox value={item.value}>
+																{item.label}
+															</Checkbox>
+														</Col>
+													)
+												}))
+												:
+												<>Không có danh mục nào</>
+											}
+										</Row>
+									</Checkbox.Group>
+								</Form.Item>
+
+								<Divider />
+
+								<Form.Item
+									label="Khoảng giá"
+									labelCol={{ span: 24 }}
+								>
+									<Row gutter={[10, 10]} style={{ width: "100%" }}>
+										<Col xl={11} md={24}>
+											<Form.Item name={["range", 'from']}>
+												<InputNumber
+													name='from'
+													min={0}
+													placeholder="Từ"
+													formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+													style={{ width: '100%' }}
+												/>
+											</Form.Item>
+										</Col>
+
+										<Col xl={2} md={0}>
+											<div > - </div>
+										</Col>
+
+										<Col xl={11} md={24}>
+											<Form.Item name={["range", 'to']}>
+												<InputNumber
+													name='to'
+													min={0}
+													placeholder="Đến"
+													formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+													style={{ width: '100%' }}
+												/>
+											</Form.Item>
+										</Col>
+									</Row>
+
+									<div>
+										<Button onClick={() => { form.submit() }}
+											style={{ width: "100%" }} type='primary'>Áp dụng</Button>
+									</div>
+								</Form.Item>
+
+								<Divider />
+
+								<Form.Item
+									label="Đánh giá"
+									labelCol={{ span: 24 }}
+								>
+									<div>
+										<Rate value={5} disabled style={{ color: '#ffce3d', fontSize: 15 }} />
+										<span className="ant-rate-text"></span>
+									</div>
+									<div>
+										<Rate value={4} disabled style={{ color: '#ffce3d', fontSize: 15 }} />
+										<span className="ant-rate-text"> trở lên</span>
+									</div>
+									<div>
+										<Rate value={3} disabled style={{ color: '#ffce3d', fontSize: 15 }} />
+										<span className="ant-rate-text"> trở lên</span>
+									</div>
+									<div>
+										<Rate value={2} disabled style={{ color: '#ffce3d', fontSize: 15 }} />
+										<span className="ant-rate-text"> trở lên</span>
+									</div>
+									<div>
+										<Rate value={1} disabled style={{ color: '#ffce3d', fontSize: 15 }} />
+										<span className="ant-rate-text"> trở lên</span>
+									</div>
+								</Form.Item>
+							</Form>
+						</div>
+					</Col>
+
+					{/* content */}
+					<Col lg={20} md={18} sm={24} xs={24}>
+						<Spin spinning={isLoading} tip="Loading...">
+							<div style={{ padding: "20px", background: '#fff', borderRadius: 5 }}>
+								<Row>
+									<Tabs
+										defaultActiveKey='&sort=-sold'
+										items={items}
+										onChange={(value) => { setSortQuery(value) }}
+										style={{ overflowX: 'auto' }}
+									/>
+								</Row>
+
+								<Row className='customize-row'>
+									{listBook?.map((item, index) => {
+										return (
+											<div className="column" key={`book-${index}`}>
+												<div className='wrapper'>
+													<div className='thumbnail'>
+														<img
+															src={`${import.meta.env.VITE_BACKEND_URL}/images/book/${item?.thumbnail}`}
+															alt="thumbnail book"
+														/>
+													</div>
+													<div className='text' title={item?.mainText}>{item?.mainText}</div>
+													<div className='price'>
+														{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item?.price ?? 0)}
+													</div>
+													<div className='rating'>
+														<Rate value={5} disabled style={{ color: '#ffce3d', fontSize: 10 }} />
+														<span>Đã bán {item?.sold ?? 0}</span>
+													</div>
+												</div>
+											</div>
+										)
+									})
+									}
+								</Row>
+
+								<div style={{ marginTop: 30 }}></div>
+
+								<Row style={{ display: "flex", justifyContent: "center" }}>
+									<Pagination
+										onChange={(p, s) => { handleOnChangePage({ current: p, pageSize: s }) }}
+										defaultCurrent={current}
+										total={total}
+										current={current}
+										pageSize={pageSize}
+										responsive
+									/>
+								</Row>
+							</div>
+						</Spin>
+					</Col>
+				</Row>
+			</div>
+		</div >
 	)
 }
 
