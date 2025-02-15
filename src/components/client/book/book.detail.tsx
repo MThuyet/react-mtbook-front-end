@@ -1,15 +1,16 @@
 import { Row, Col } from "antd";
 import 'styles/book.scss';
 import ImageGallery from "react-image-gallery";
-import { Rate, InputNumber, Image, Carousel } from 'antd';
+import { Rate, InputNumber, Image } from 'antd';
 import { ShoppingCartOutlined } from '@ant-design/icons';
-import { useParams, } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
-import { getBookDetailAPI } from "services/api";
+import { useEffect, useState } from "react";
 
-const BookDetail = () => {
-	const { id } = useParams();
-	const [dataBook, setDataBook] = useState<IBookTable | null>(null);
+interface IProps {
+	currentBook: IBookTable | null,
+}
+
+const BookDetail = (props: IProps) => {
+	const { currentBook } = props;
 	const [images, setImages] = useState<
 		{
 			original: string,
@@ -20,25 +21,18 @@ const BookDetail = () => {
 	>([]);
 
 	useEffect(() => {
-		const fetchBookDetail = async () => {
-			const res = await getBookDetailAPI(id as string);
-			if (res.data) {
-				let arrImage = [res.data.thumbnail, ...res.data.slider];
-				let b = arrImage.map(item => {
-					return {
-						original: `${import.meta.env.VITE_BACKEND_URL}/images/book/${item}`,
-						thumbnail: `${import.meta.env.VITE_BACKEND_URL}/images/book/${item}`,
-						originalClass: "original-image",
-						thumbnailClass: "thumbnail-image"
-					}
-				})
-				setImages(b);
-				setDataBook(res.data);
-			}
+		if (currentBook) {
+			let arrImage = [currentBook.thumbnail, ...currentBook.slider];
+			setImages(arrImage.map((item: string) => {
+				return {
+					original: `${import.meta.env.VITE_BACKEND_URL}/images/book/${item}`,
+					thumbnail: `${import.meta.env.VITE_BACKEND_URL}/images/book/${item}`,
+					originalClass: 'original-image',
+					thumbnailClass: 'thumbnail-image'
+				}
+			}));
 		}
-
-		fetchBookDetail();
-	}, [id])
+	}, [currentBook]);
 
 	return (
 		<>
@@ -85,10 +79,10 @@ const BookDetail = () => {
 									<div className="content">
 										<div className="author">
 											<span>Tác giả:</span>
-											<a href="#">{dataBook?.author}</a>
+											<a href="#">{currentBook?.author}</a>
 										</div>
 
-										<div className="name">{dataBook?.mainText}</div>
+										<div className="name">{currentBook?.mainText}</div>
 
 										<div className="description">
 											Mỗi quyển sách là một kho tàng tri thức vô giá, không chỉ lưu giữ những câu chuyện, ý tưởng và bài học quý báu mà còn mở ra cánh cửa dẫn đến những thế giới mới lạ, giúp con người hiểu sâu hơn về chính mình và cuộc sống xung quanh. Dù là những trang sách về lịch sử, khoa học, văn học hay triết học, mỗi cuốn sách đều mang trong mình sức mạnh thay đổi tư duy, nuôi dưỡng tâm hồn và truyền cảm hứng cho những hành trình khám phá vô tận của con người.
@@ -96,11 +90,11 @@ const BookDetail = () => {
 
 										<div className="rate">
 											<Rate disabled defaultValue={5} style={{ fontSize: 16 }} />
-											<span style={{ color: '#80868b' }}>Đã bán {dataBook?.sold}</span>
+											<span style={{ color: '#80868b' }}>Đã bán {currentBook?.sold}</span>
 										</div>
 
 										<div className="price">
-											{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(dataBook?.price ?? 0)}
+											{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(currentBook?.price ?? 0)}
 										</div>
 
 										<div className="delivery" style={{ marginBottom: '10px' }}>

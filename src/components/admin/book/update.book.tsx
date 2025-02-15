@@ -370,7 +370,6 @@ export const UpdateBook = (props: IProps) => {
 								labelCol={{ span: 24 }}
 								label="Images Slider"
 								name="slider"
-								rules={[{ required: true, message: 'Please upload slider!' }]}
 								//convert value from Upload => form
 								valuePropName="fileList"
 								getValueFromEvent={normFile}
