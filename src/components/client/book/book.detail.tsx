@@ -62,7 +62,7 @@ const BookDetail = (props: IProps) => {
 			localStorage.setItem("carts", JSON.stringify(carts));
 			//sync React Context
 			setCarts(carts);
-			message.success('Add to cart successfully');
+			message.success('Thêm sản phẩm vào giỏ hàng thành công!');
 		} else {
 			//create
 			const data = [{
@@ -73,11 +73,9 @@ const BookDetail = (props: IProps) => {
 			localStorage.setItem("carts", JSON.stringify(data))
 			//sync React Context
 			setCarts(data);
-			message.success('Add to cart successfully');
+			message.success('Thêm sản phẩm vào giỏ hàng thành công!');
 		}
 	};
-
-	console.log('carts', carts);
 
 	return (
 		<>

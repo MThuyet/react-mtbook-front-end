@@ -23,14 +23,18 @@ export const AppProvider = (props: TProps) => {
 	const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 	const [user, setUser] = useState<IUser | null>(null);
 	const [isAppLoading, setIsAppLoading] = useState<boolean>(true);
-	const [carts, setCarts] = useState<ICart[]>([])
+	const [carts, setCarts] = useState<ICart[]>([]);
 
 	useEffect(() => {
 		const fetchAccount = async () => {
 			const res = await fetchAccountAPI();
+			const carts = localStorage.getItem("carts");
 			if (res.data) {
 				setUser(res.data.user);
 				setIsAuthenticated(true);
+				if (carts) {
+					setCarts(JSON.parse(carts));
+				}
 			}
 			setIsAppLoading(false)
 		}
