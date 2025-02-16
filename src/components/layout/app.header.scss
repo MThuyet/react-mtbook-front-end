@@ -1,3 +1,7 @@
+:root {
+	--primary-color: #007BFF;
+}
+
 .header-container {
 	.page-header {
 		display: flex;
@@ -36,7 +40,7 @@
 		}
 
 		.logo {
-			color: #61dafb;
+			color: var(--primary-color);
 			cursor: pointer;
 			display: block;
 
@@ -117,7 +121,7 @@
 					font-size: 20px;
 					top: 5px;
 					position: relative;
-					color: #61dafb;
+					color: var(--primary-color);
 				}
 			}
 		}

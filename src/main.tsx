@@ -21,6 +21,7 @@ import ManageUserPage from 'pages/admin/manage.user';
 import LayoutAdmin from 'components/layout/layout.admin';
 import enUS from 'antd/locale/en_US';
 import viVN from 'antd/locale/vi_VN';
+import OrderPage from './pages/client/order';
 
 // config message
 message.config({
@@ -39,6 +40,14 @@ const router = createBrowserRouter([
 			{
 				path: "/book/:id",
 				element: <BookPage />,
+			},
+			{
+				path: "/order",
+				element: (
+					<ProtectedRoute>
+						<OrderPage />
+					</ProtectedRoute>
+				),
 			},
 			{
 				path: "/about",
