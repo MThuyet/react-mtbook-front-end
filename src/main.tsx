@@ -11,7 +11,7 @@ import LoginPage from 'pages/client/auth/login';
 import RegisterPage from 'pages/client/auth/register';
 import 'styles/global.scss'
 import HomePage from 'pages/client/home';
-import { App, ConfigProvider } from 'antd';
+import { App, ConfigProvider, message } from 'antd';
 import { AppProvider } from 'components/context/app.context';
 import ProtectedRoute from '@/components/auth';
 import DashBoardPage from 'pages/admin/dashboard';
@@ -21,6 +21,11 @@ import ManageUserPage from 'pages/admin/manage.user';
 import LayoutAdmin from 'components/layout/layout.admin';
 import enUS from 'antd/locale/en_US';
 import viVN from 'antd/locale/vi_VN';
+
+// config message
+message.config({
+	maxCount: 2
+})
 
 const router = createBrowserRouter([
 	{

@@ -1,16 +1,22 @@
-import { Row, Col } from "antd";
+import { Row, Col, message } from "antd";
 import 'styles/book.scss';
 import ImageGallery from "react-image-gallery";
 import { Rate, InputNumber, Image } from 'antd';
 import { ShoppingCartOutlined } from '@ant-design/icons';
 import { useEffect, useState } from "react";
+import { useCurrentApp } from "components/context/app.context";
 
 interface IProps {
 	currentBook: IBookTable | null,
 }
 
 const BookDetail = (props: IProps) => {
+	// use context
+	const { carts, setCarts } = useCurrentApp();
+
 	const { currentBook } = props;
+	const [valueQuantity, setValueQuantity] = useState<number>(1);
+
 	const [images, setImages] = useState<
 		{
 			original: string,
@@ -20,6 +26,7 @@ const BookDetail = (props: IProps) => {
 		}[]
 	>([]);
 
+	// show list image
 	useEffect(() => {
 		if (currentBook) {
 			let arrImage = [currentBook.thumbnail, ...currentBook.slider];
@@ -33,6 +40,44 @@ const BookDetail = (props: IProps) => {
 			}));
 		}
 	}, [currentBook]);
+
+	// handle add to cart
+	const handleAddToCart = () => {
+		const cartStorage = localStorage.getItem("carts");
+		if (cartStorage && currentBook) {
+			//update
+			const carts = JSON.parse(cartStorage) as ICart[];
+			//check exist
+			let isExistIndex = carts.findIndex(c => c._id === currentBook?._id);
+			if (isExistIndex > -1) {
+				carts[isExistIndex].quantity =
+					carts[isExistIndex].quantity + valueQuantity;
+			} else {
+				carts.push({
+					quantity: valueQuantity,
+					_id: currentBook._id,
+					detail: currentBook
+				})
+			}
+			localStorage.setItem("carts", JSON.stringify(carts));
+			//sync React Context
+			setCarts(carts);
+			message.success('Add to cart successfully');
+		} else {
+			//create
+			const data = [{
+				_id: currentBook?._id!,
+				quantity: valueQuantity,
+				detail: currentBook!
+			}]
+			localStorage.setItem("carts", JSON.stringify(data))
+			//sync React Context
+			setCarts(data);
+			message.success('Add to cart successfully');
+		}
+	};
+
+	console.log('carts', carts);
 
 	return (
 		<>
@@ -105,12 +150,26 @@ const BookDetail = (props: IProps) => {
 										<div className="quantity">
 											<span className="title">Số lượng</span>
 											<span className="content">
-												<InputNumber min={1} defaultValue={1} />
+												<InputNumber
+													value={valueQuantity}
+													defaultValue={1}
+													min={1}
+													max={currentBook?.quantity}
+													onChange={(valueChanged) => {
+														if (valueChanged) {
+															setValueQuantity(valueChanged);
+														} else {
+															message.error("Vui lòng nhập số lượng ít nhất là 1");
+															setValueQuantity(1);
+														}
+
+													}}
+												/>
 											</span>
 										</div>
 
 										<div className="buy">
-											<button>
+											<button onClick={() => handleAddToCart()}>
 												<ShoppingCartOutlined />
 												<span>Thêm vào giỏ hàng</span>
 											</button>

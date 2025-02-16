@@ -84,4 +84,10 @@ declare global {
 		__v: number;
 	}
 
+	interface ICart {
+		_id: string;
+		detail: IBookTable;
+		quantity: number;
+	}
+
 }
