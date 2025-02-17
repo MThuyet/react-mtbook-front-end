@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Input } from 'antd';
 import { useCurrentApp } from '@/components/context/app.context';
 import type { FormProps } from 'antd';
-import { getOrderAPI } from '@/services/api';
+import { createOrderAPI } from '@/services/api';
 
 const { TextArea } = Input;
 
@@ -64,23 +64,22 @@ const Payment = (props: IProps) => {
 	}
 
 	const handlePlaceOrder: FormProps<FieldType>['onFinish'] = async (values) => {
+		const { fullName, phone, address, method } = values;
+		const detail = carts.map(item => ({
+			_id: item._id,
+			quantity: item.quantity,
+			bookName: item.detail.mainText
+		}))
+
 		setIsSubmit(true);
 
-		const { fullName, phone, address, method } = values;
-		const detail = carts.map(item => {
-			return {
-				bookName: item.detail.mainText,
-				quantity: item.quantity,
-				_id: item._id
-			}
-		});
-
-		const res = await getOrderAPI(fullName, address, phone, totalPrice, method, detail);
+		const res = await createOrderAPI(fullName, address, phone, totalPrice, method, detail);
 
 		if (res && res.data) {
 			message.success('Đặt hàng thành công');
 			setCarts([]);
 			localStorage.removeItem("carts");
+			setCurrentStep(2);
 		} else {
 			notification.error({
 				message: 'Lỗi khi đặt hàng!',
@@ -88,7 +87,6 @@ const Payment = (props: IProps) => {
 			})
 		}
 
-		setCurrentStep(2);
 		setIsSubmit(false);
 	}
 
@@ -101,11 +99,15 @@ const Payment = (props: IProps) => {
 						<div className='order-book' key={`index-${index}`}>
 							<div className='book-content'>
 								<img src={`${import.meta.env.VITE_BACKEND_URL}/images/book/${book?.detail?.thumbnail}`} />
-								<div className='title'>
-									{book?.detail?.mainText}
-								</div>
-								<div className='price'>
-									{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(currentBookPrice)}
+								<div className='info'>
+									<div className='title'>{book.detail.mainText}</div>
+									<div className='price'>
+										Đơn giá:
+										<span style={{ marginLeft: 10, color: "#007bff" }}>
+											{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' })
+												.format(book.detail.price)}
+										</span>
+									</div>
 								</div>
 							</div>
 							<div className='action'>
@@ -115,11 +117,13 @@ const Payment = (props: IProps) => {
 								<div className='sum' style={{ fontWeight: '500' }}>
 									Tổng:  {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(currentBookPrice * (book?.quantity ?? 0))}
 								</div>
-								<DeleteTwoTone
-									style={{ cursor: "pointer" }}
-									onClick={() => handleRemoveBook(book._id)}
-									twoToneColor="#eb2f96"
-								/>
+								<div className='remove'>
+									<DeleteTwoTone
+										style={{ cursor: "pointer" }}
+										twoToneColor="#eb2f96"
+										onClick={() => handleRemoveBook(book._id)}
+									/>
+								</div>
 							</div>
 						</div>
 					)

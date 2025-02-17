@@ -22,6 +22,7 @@ import LayoutAdmin from 'components/layout/layout.admin';
 import enUS from 'antd/locale/en_US';
 import viVN from 'antd/locale/vi_VN';
 import OrderPage from './pages/client/order';
+import HistoryPage from './pages/client/history';
 
 // config message
 message.config({
@@ -50,17 +51,13 @@ const router = createBrowserRouter([
 				),
 			},
 			{
-				path: "/about",
-				element: <AboutPage />,
-			},
-			{
-				path: "/checkout",
+				path: "/history",
 				element: (
 					<ProtectedRoute>
-						<div>checkout page</div>
+						<HistoryPage />
 					</ProtectedRoute>
 				),
-			}
+			},
 		]
 	},
 	{

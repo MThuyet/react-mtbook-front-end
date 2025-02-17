@@ -43,7 +43,9 @@ const OrderPage = () => {
 							<Button key="home">
 								<Link to="/">Trang chủ</Link>
 							</Button>,
-							<Button key="buy">Xem lịch sử đặt hàng</Button>,
+							<Button key="history">
+								<Link to="/history">Xem lịch sử đặt hàng</Link>
+							</Button>,
 						]}
 					/>
 				}

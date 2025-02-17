@@ -61,7 +61,7 @@ const OrderDetail = (props: IProps) => {
 					<Row gutter={[20, 20]}>
 						<Col md={17} xs={24}>
 							<div style={{ position: "absolute", top: "100%", left: "50%", transform: "translate(-50%, -50%)" }}>
-								<Link to="/"> Bấm vào đây để xem thêm sản phẩm</Link>
+								<Link to="/">Xem thêm sản phẩm</Link>
 							</div>
 							{carts && carts.length > 0
 								? carts.map((item, index) => {
@@ -69,16 +69,20 @@ const OrderDetail = (props: IProps) => {
 										<div className='order-book' key={`book-${index}`}>
 											<div className='book-content'>
 												<img src={`${import.meta.env.VITE_BACKEND_URL}/images/book/${item?.detail?.thumbnail}`} />
-												<div className='title'>
-													{item.detail.mainText}
-												</div>
-												<div className='price'>
-													{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' })
-														.format(item.detail.price)}
+												<div className='info'>
+													<div className='title'>{item.detail.mainText}</div>
+													<div className='price'>
+														Đơn giá:
+														<span style={{ marginLeft: 10, color: "#007bff" }}>
+															{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' })
+																.format(item.detail.price)}
+														</span>
+													</div>
 												</div>
 											</div>
 											<div className='action'>
 												<div className='quantity'>
+													<span>Số lượng:</span>
 													<InputNumber
 														min={1}
 														value={item.quantity}
@@ -89,11 +93,13 @@ const OrderDetail = (props: IProps) => {
 													Tổng:  {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' })
 														.format(item.detail.price * carts[index].quantity)}
 												</div>
-												<DeleteTwoTone
-													style={{ cursor: "pointer" }}
-													twoToneColor="#eb2f96"
-													onClick={() => { removeOrder(index) }}
-												/>
+												<div className='remove'>
+													<DeleteTwoTone
+														style={{ cursor: "pointer" }}
+														twoToneColor="#eb2f96"
+														onClick={() => { removeOrder(index) }}
+													/>
+												</div>
 											</div>
 										</div>
 									);

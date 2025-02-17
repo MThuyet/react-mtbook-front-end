@@ -6,17 +6,28 @@
 		background: white;
 		padding: 20px;
 		border-radius: 5px;
+		position: relative;
 
 		.book-content {
 			display: flex;
 			align-items: center;
 			gap: 15px;
 			width: 50%;
-			justify-content: space-between;
+			justify-content: start;
 
 			img {
 				width: 70px;
 				height: 70px;
+			}
+
+			.info {
+				display: flex;
+				flex-direction: column;
+				gap: 10px;
+
+				.title {
+					font-weight: 500;
+				}
 			}
 		}
 
@@ -26,6 +37,45 @@
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
+
+			.quantity {
+				display: flex;
+				gap: 10px;
+				align-items: center;
+			}
+		}
+	}
+
+	@media screen and (max-width: 480px) {
+		.order-book {
+			flex-direction: column;
+
+			.book-content {
+				width: 100%;
+			}
+
+			.action {
+				margin-left: 10px;
+				width: 100%;
+				flex-direction: column;
+				align-items: start;
+
+				.quantity {
+					display: flex;
+					margin-bottom: 10px;
+				}
+
+				.sum {
+					font-size: 18px;
+				}
+
+				.remove {
+					position: absolute;
+					right: 25px;
+					bottom: 20px;
+					font-size: 16px;
+				}
+			}
 		}
 	}
 
