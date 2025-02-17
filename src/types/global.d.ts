@@ -106,4 +106,10 @@ declare global {
 		__v: number;
 	}
 
+	interface IDashboard {
+		countOrder: number;
+		countUser: number;
+		countBook: number;
+	}
+
 }

@@ -137,3 +137,13 @@ export const updateUserPasswordAPI = (
 	return axios.post<IBackendRes<IRegister>>(urlBackend,
 		{ email, oldpass, newpass })
 }
+
+export const getOrderWithPaginateAPI = (query: string) => {
+	const urlBackend = `/api/v1/order?${query}`;
+	return axios.get<IBackendRes<IModelPaginate<IOrderTable>>>(urlBackend);
+}
+
+export const getDashboardAPI = () => {
+	const urlBackend = '/api/v1/database/dashboard';
+	return axios.get<IBackendRes<IDashboard>>(urlBackend);
+}
