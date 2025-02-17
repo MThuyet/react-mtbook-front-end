@@ -1,10 +1,10 @@
-import { Row, Col, message } from "antd";
 import 'styles/book.scss';
 import ImageGallery from "react-image-gallery";
-import { Rate, InputNumber, Image } from 'antd';
+import { Rate, InputNumber, Image, Breadcrumb, Row, Col, message } from 'antd';
 import { ShoppingCartOutlined } from '@ant-design/icons';
 import { useEffect, useState } from "react";
 import { useCurrentApp } from "components/context/app.context";
+import { Link, useNavigate } from 'react-router-dom';
 
 interface IProps {
 	currentBook: IBookTable | null,
@@ -12,7 +12,8 @@ interface IProps {
 
 const BookDetail = (props: IProps) => {
 	// use context
-	const { carts, setCarts } = useCurrentApp();
+	const { setCarts, user } = useCurrentApp();
+	const navigate = useNavigate();
 
 	const { currentBook } = props;
 	const [valueQuantity, setValueQuantity] = useState<number>(1);
@@ -42,7 +43,11 @@ const BookDetail = (props: IProps) => {
 	}, [currentBook]);
 
 	// handle add to cart
-	const handleAddToCart = () => {
+	const handleAddToCart = (isBuyNow = false) => {
+		if (!user) {
+			message.error("Bạn cần đăng nhập để thực hiện tính năng này.")
+			return;
+		}
 		const cartStorage = localStorage.getItem("carts");
 		if (cartStorage && currentBook) {
 			//update
@@ -59,10 +64,11 @@ const BookDetail = (props: IProps) => {
 					detail: currentBook
 				})
 			}
+
 			localStorage.setItem("carts", JSON.stringify(carts));
+
 			//sync React Context
 			setCarts(carts);
-			message.success('Thêm sản phẩm vào giỏ hàng thành công!');
 		} else {
 			//create
 			const data = [{
@@ -70,17 +76,35 @@ const BookDetail = (props: IProps) => {
 				quantity: valueQuantity,
 				detail: currentBook!
 			}]
-			localStorage.setItem("carts", JSON.stringify(data))
+			localStorage.setItem("carts", JSON.stringify(data));
+
 			//sync React Context
 			setCarts(data);
-			message.success('Thêm sản phẩm vào giỏ hàng thành công!');
 		}
+
+		if (isBuyNow) {
+			navigate("/order")
+		} else {
+			message.success("Thêm sản phẩm vào giỏ hàng thành công.")
+		}
+
 	};
 
 	return (
 		<>
 			<div style={{ background: '#efefef', padding: '20px 0' }}>
 				<div className="view-detail-book" style={{ maxWidth: 1440, margin: '0 auto', minHeight: "calc(100vh - 150px)" }}>
+					<Breadcrumb
+						separator=">"
+						items={[
+							{
+								title: <Link to={"/"}>Trang Chủ</Link>,
+							},
+							{
+								title: 'Xem chi tiết sách',
+							},
+						]}
+					/>
 					<div style={{ padding: '20px', background: '#fff', borderRadius: 5 }}>
 						<Row gutter={[20, 20]}>
 							{/* show list image */}
@@ -172,7 +196,7 @@ const BookDetail = (props: IProps) => {
 												<span>Thêm vào giỏ hàng</span>
 											</button>
 
-											<button>Mua ngay</button>
+											<button onClick={() => handleAddToCart(true)} className='now'>Mua ngay</button>
 										</div>
 									</div>
 								</Col>

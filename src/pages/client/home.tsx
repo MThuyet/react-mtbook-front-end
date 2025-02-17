@@ -5,7 +5,7 @@ import 'styles/home.scss';
 import { useState, useEffect } from 'react';
 import { getBooksAPI, getCategoryAPI } from '@/services/api';
 import { notification, Spin } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import MobileFilter from '@/components/client/book/mobile.filter';
 
 type FieldType = {
@@ -17,9 +17,10 @@ type FieldType = {
 };
 
 const HomePage = () => {
+	const [searchTerm] = useOutletContext() as any;
+
 	// show on mobile
 	const [showMobileFilter, setShowMobileFilter] = useState<boolean>(false);
-	const [isReset, setIsReset] = useState<boolean>(false);
 
 	// redirec to detail book
 	const navigate = useNavigate();
@@ -60,7 +61,7 @@ const HomePage = () => {
 	const [listBook, setListBook] = useState<IBookTable[]>([]);
 	const [total, setTotal] = useState<number>(0);
 	const [current, setCurrent] = useState<number>(1);
-	const [pageSize, setPageSize] = useState<number>(5);
+	const [pageSize, setPageSize] = useState<number>(10);
 
 	// pagination
 	const handleOnChangePage = (pagination: { current: number, pageSize: number }) => {
@@ -83,8 +84,13 @@ const HomePage = () => {
 		if (filter && filter !== '') {
 			query += `&${filter}`;
 		};
+
 		if (sortQuery) {
 			query += `${sortQuery}`;
+		};
+
+		if (searchTerm) {
+			query += `&mainText=/${searchTerm}/i`;
 		}
 
 		const res = await getBooksAPI(query);
@@ -156,12 +162,12 @@ const HomePage = () => {
 
 	useEffect(() => {
 		fetchBook();
-	}, [current, pageSize, filter, sortQuery])
+	}, [current, pageSize, filter, sortQuery, searchTerm]);
 
 	return (
 		<>
 			<div style={{ background: '#efefef', padding: '20px 0' }}>
-				<div className="homepage-container" style={{ maxWidth: 1440, margin: '0 auto' }}>
+				<div className="homepage-container" style={{ maxWidth: 1440, margin: '0 auto', overflow: "hidden" }}>
 					<Row gutter={[20, 20]}>
 						{/* sidebar */}
 						<Col lg={4} md={6} sm={0} xs={0}>
