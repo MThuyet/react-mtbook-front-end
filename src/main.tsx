@@ -23,6 +23,7 @@ import enUS from 'antd/locale/en_US';
 import viVN from 'antd/locale/vi_VN';
 import OrderPage from './pages/client/order';
 import HistoryPage from './pages/client/history';
+import ReturnURLPage from 'components/client/order/return.utl';
 
 // config message
 message.config({
@@ -54,7 +55,7 @@ const router = createBrowserRouter([
 				path: "vnpay/return-url",
 				element: (
 					<ProtectedRoute>
-						<div>Mờ Thuyết return url</div>
+						<ReturnURLPage />
 					</ProtectedRoute>
 				)
 			},

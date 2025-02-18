@@ -3,14 +3,13 @@ import {
 	AppstoreOutlined,
 	ExceptionOutlined,
 	HeartTwoTone,
-	TeamOutlined,
 	UserOutlined,
 	DollarCircleOutlined,
 	MenuFoldOutlined,
 	MenuUnfoldOutlined,
 } from '@ant-design/icons';
 import { Layout, Menu, Dropdown, Space, Avatar } from 'antd';
-import { Outlet, Link, useLocation } from "react-router-dom";
+import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useCurrentApp } from '../context/app.context';
 import type { MenuProps } from 'antd';
 import { logoutAPI } from '@/services/api';
@@ -19,7 +18,6 @@ import { useEffect } from "react";
 type MenuItem = Required<MenuProps>['items'][number];
 
 const { Content, Footer, Sider } = Layout;
-
 
 const LayoutAdmin = () => {
 	const [collapsed, setCollapsed] = useState(false);
@@ -46,16 +44,9 @@ const LayoutAdmin = () => {
 			icon: <AppstoreOutlined />
 		},
 		{
-			label: <span>Manage Users</span>,
+			label: <Link to='/admin/user'>Manage User</Link>,
 			key: '/admin/user',
 			icon: <UserOutlined />,
-			children: [
-				{
-					label: <Link to='/admin/user'>CRUD</Link>,
-					key: '/admin/user',
-					icon: <TeamOutlined />,
-				},
-			]
 		},
 		{
 			label: <Link to='/admin/book'>Manage Books</Link>,
@@ -75,13 +66,6 @@ const LayoutAdmin = () => {
 	}, [location]);
 
 	const itemsDropdown = [
-		{
-			label: <label
-				style={{ cursor: 'pointer' }}
-				onClick={() => alert("me")}
-			>Quản lý tài khoản</label>,
-			key: 'account',
-		},
 		{
 			label: <Link to={'/'}>Trang chủ</Link>,
 			key: 'home',

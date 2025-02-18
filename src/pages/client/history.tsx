@@ -69,9 +69,14 @@ const HistoryPage = () => {
 		{
 			title: 'Trạng thái',
 			key: 'status',
-			render() {
-				return <Tag color="green" style={{ padding: '5px 10px' }}>Thành công</Tag>
+			render(value, record, index) {
+				return <Tag color={record.paymentStatus === 'UNPAID' ? 'volcano' : 'green'} style={{ padding: '5px 10px' }}>{record.paymentStatus}</Tag>
 			}
+		},
+		{
+			title: 'Payment Ref',
+			dataIndex: 'paymentRef',
+			key: 'paymentRef',
 		},
 		{
 			title: 'Chi tiết',
@@ -123,7 +128,7 @@ const HistoryPage = () => {
 		}
 
 		fetchOrder();
-	}, [dataTable]);
+	}, []);
 
 	return (
 		<div style={{ padding: 10 }}>
@@ -224,7 +229,7 @@ const HistoryPage = () => {
 
 						{dataDrawer.detail.length > 0 && dataDrawer.detail.map(item => {
 							return (
-								<Descriptions bordered column={1} className='info-book' style={{ marginTop: 15 }}>
+								<Descriptions bordered column={1} className='info-book' style={{ marginTop: 15 }} key={`history-${item._id}`}>
 									<Descriptions.Item
 										labelStyle={{ width: '40%' }}
 										contentStyle={{ width: '60%' }}

@@ -11,6 +11,17 @@ export const getVNPayUrlAPI = (amount: number, locale: string, paymentRef: strin
 	)
 }
 
+export const updatePaymentStatusAPI = (paymentStatus: string, paymentRef: string) => {
+	const urlBackend = '/api/v1/order/update-payment-status';
+	return axios.post<IBackendRes<IRegister>>(urlBackend, { paymentStatus, paymentRef },
+		{
+			headers: {
+				delay: 2000
+			}
+		}
+	);
+}
+
 export const loginAPI = (username: string, password: string) => {
 	const urlBackend = '/api/v1/auth/login';
 	return axios.post<IBackendRes<ILogin>>(urlBackend, { username, password });
