@@ -51,6 +51,14 @@ const router = createBrowserRouter([
 				),
 			},
 			{
+				path: "vnpay/return-url",
+				element: (
+					<ProtectedRoute>
+						<div>Mờ Thuyết return url</div>
+					</ProtectedRoute>
+				)
+			},
+			{
 				path: "/history",
 				element: (
 					<ProtectedRoute>

@@ -1,4 +1,15 @@
-import axios from 'services/axios.customize'
+import createInstanceAxios from 'services/axios.customize';
+
+const axios = createInstanceAxios(import.meta.env.VITE_BACKEND_URL);
+
+const axiosPayment = createInstanceAxios(import.meta.env.VITE_BACKEND_PAYMENT_URL);
+
+export const getVNPayUrlAPI = (amount: number, locale: string, paymentRef: string) => {
+	const urlBackend = '/vnpay/payment-url';
+	return axiosPayment.post<IBackendRes<{ url: string }>>(
+		urlBackend, { amount, locale, paymentRef }
+	)
+}
 
 export const loginAPI = (username: string, password: string) => {
 	const urlBackend = '/api/v1/auth/login';
@@ -113,10 +124,14 @@ export const getBookDetailAPI = (_id: string) => {
 
 export const createOrderAPI = (
 	name: string, address: string, phone: string, totalPrice: number,
-	type: string, detail: { bookName: string, quantity: number, _id: string }[]
+	type: string, detail: { bookName: string, quantity: number, _id: string }[],
+	paymentRef?: string
 ) => {
 	const urlBackend = '/api/v1/order';
-	return axios.post<IBackendRes<IBookTable>>(urlBackend, { name, address, phone, totalPrice, type, detail });
+	return axios.post<IBackendRes<IBookTable>>
+		(urlBackend,
+			{ name, address, phone, totalPrice, type, detail, paymentRef }
+		);
 }
 
 export const getOrderAPI = () => {
