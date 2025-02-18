@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import './login.scss';
 import type { FormProps } from 'antd';
 import { Button, Divider, Form, Input, App } from 'antd';
-import { loginAPI } from 'services/api';
+import { loginAPI, loginWithGoogleAPI } from 'services/api';
 import { useCurrentApp } from '@/components/context/app.context';
 import { GooglePlusOutlined } from '@ant-design/icons';
 import { useGoogleLogin } from '@react-oauth/google';
@@ -68,7 +68,22 @@ const Login: React.FC = () => {
 			);
 
 			if (data && data.email) {
-				console.log(data.email);
+				const res = await loginWithGoogleAPI("GOOGLE", data.email);
+				console.log(res);
+
+				if (res.data) {
+					setIsAuthenticated(true);
+					setUser(res.data.user);
+					localStorage.setItem('access_token', res.data.access_token);
+					message.success('Đăng nhập thành công');
+					navigate('/');
+				} else {
+					notification.error({
+						message: 'Có lỗi xảy ra',
+						description: res.message && Array.isArray(res.message) ? res.message[0] : res.message,
+						duration: 5
+					})
+				}
 			}
 		}
 	});
