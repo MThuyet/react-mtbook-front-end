@@ -5,6 +5,9 @@ import type { FormProps } from 'antd';
 import { Button, Divider, Form, Input, App } from 'antd';
 import { loginAPI } from 'services/api';
 import { useCurrentApp } from '@/components/context/app.context';
+import { GooglePlusOutlined } from '@ant-design/icons';
+import { useGoogleLogin } from '@react-oauth/google';
+import axios from 'axios';
 
 // define type
 type FieldType = {
@@ -53,6 +56,23 @@ const Login: React.FC = () => {
 
 	};
 
+	const loginGoogle = useGoogleLogin({
+		onSuccess: async (tokenResponse) => {
+			const { data } = await axios(
+				"https://www.googleapis.com/oauth2/v3/userinfo",
+				{
+					headers: {
+						Authorization: `Bearer ${tokenResponse?.access_token}`,
+					},
+				}
+			);
+
+			if (data && data.email) {
+				console.log(data.email);
+			}
+		}
+	});
+
 	return (
 		<div className="login-page">
 			<div className="main">
@@ -96,6 +116,20 @@ const Login: React.FC = () => {
 							</Form.Item>
 
 							<Divider>Hoặc</Divider>
+							<div
+								onClick={() => loginGoogle()}
+								title='Đăng nhập với tài khoản Google'
+								style={{
+									display: "flex", alignItems: "center",
+									justifyContent: "center", gap: 10,
+									textAlign: "center", marginBottom: 25,
+									cursor: "pointer"
+								}}>
+								Đăng nhập với
+								<GooglePlusOutlined
+									style={{ fontSize: 30, color: "orange" }} />
+							</div>
+
 
 							<p className="text text-normal" style={{ textAlign: "center" }}>
 								Chưa có tài khoản ?

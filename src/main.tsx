@@ -6,7 +6,6 @@ import {
 	RouterProvider,
 } from "react-router-dom";
 import BookPage from 'pages/client/book';
-import AboutPage from 'pages/client/about';
 import LoginPage from 'pages/client/auth/login';
 import RegisterPage from 'pages/client/auth/register';
 import 'styles/global.scss'
@@ -24,6 +23,7 @@ import viVN from 'antd/locale/vi_VN';
 import OrderPage from './pages/client/order';
 import HistoryPage from './pages/client/history';
 import ReturnURLPage from 'components/client/order/return.utl';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 // config message
 message.config({
@@ -131,7 +131,9 @@ createRoot(document.getElementById('root')!).render(
 	<StrictMode>
 		<App>
 			<AppProvider>
-				<ConfigProvider locale={enUS}> <RouterProvider router={router} /></ConfigProvider>
+				<GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+					<ConfigProvider locale={enUS}> <RouterProvider router={router} /></ConfigProvider>
+				</GoogleOAuthProvider>
 			</AppProvider>
 		</App>
 	</StrictMode>,
