@@ -1,4 +1,7 @@
-import axios from 'axios'
+import axios from 'axios';
+import { Mutex } from "async-mutex";
+
+const mutex = new Mutex();
 
 const createInstanceAxios = (baseURL: string) => {
 	const instance = axios.create({
@@ -7,12 +10,11 @@ const createInstanceAxios = (baseURL: string) => {
 	});
 
 	const handleRefreshToken = async () => {
-		const res = await instance.get('/api/v1/auth/refresh');
-		if (res.data) {
-			return res.data.access_token;
-		} else {
-			return null
-		}
+		return await mutex.runExclusive(async () => {
+			const res = await instance.get('/api/v1/auth/refresh');
+			if (res && res.data) return res.data.access_token;
+			else return null;
+		});
 	}
 
 	// Add a request interceptor
