@@ -7,13 +7,15 @@ import { deleteBookAPI, getBooksAPI } from '@/services/api';
 import dayjs from 'dayjs';
 import { EditOutlined, DeleteOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { FORMATE_DATE_VN, FORMATE_DATE_DEFAULT, dateRangeValidate } from '@/services/helper';
-import { CSVLink } from "react-csv";
+import * as ReactCSV from "react-csv";
 import { ExportOutlined } from "@ant-design/icons";
 import { DetailBook } from './detail.book';
 import { CreateBook } from './create.book';
 import { UpdateBook } from './update.book';
 import { Popconfirm } from "antd";
 import type { PopconfirmProps } from "antd";
+
+const CSVLink = ReactCSV.CSVLink;
 
 type TSearch = {
 	category: string;

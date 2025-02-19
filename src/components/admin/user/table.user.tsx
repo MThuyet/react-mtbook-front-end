@@ -10,10 +10,12 @@ import dayjs from 'dayjs';
 import { FORMATE_DATE_VN, FORMATE_DATE_DEFAULT } from '@/services/helper';
 import CreateUser from 'components/admin/user/create.user';
 import ImportUser from '@/components/admin/user/data/import.user';
-import { CSVLink } from "react-csv";
+import * as ReactCSV from "react-csv";
 import UpdateUser from './update.user';
 import type { PopconfirmProps } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
+
+const CSVLink = ReactCSV.CSVLink;
 
 type TSearch = {
 	fullName: string;

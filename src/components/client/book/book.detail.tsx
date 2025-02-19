@@ -1,5 +1,6 @@
 import 'styles/book.scss';
 import ImageGallery from "react-image-gallery";
+import "react-image-gallery/styles/css/image-gallery.css";
 import { Rate, InputNumber, Image, Breadcrumb, Row, Col, message } from 'antd';
 import { ShoppingCartOutlined } from '@ant-design/icons';
 import { useEffect, useState } from "react";
