@@ -114,10 +114,12 @@ const AppHeader = (props: IProps) => {
 						</div>
 						<div className='page-header__logo'>
 							<span className='logo'>
-								<span onClick={() => navigate('/')}> <FaReact className='rotate icon-react' />Mờ Thuyết</span>
-
-								<VscSearchFuzzy className='icon-search' />
+								<span onClick={() => navigate('/')}>
+									<img src="/src/assets/MTBook.png" alt="" className='icon-logo' />
+									<span>MTBook</span>
+								</span>
 							</span>
+							<VscSearchFuzzy className='icon-search' />
 							<input
 								className="input-search" type={'text'}
 								placeholder="Bạn tìm gì hôm nay"
