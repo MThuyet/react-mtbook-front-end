@@ -116,10 +116,11 @@ const TableOrder = () => {
 
 	const headerCsvData = [
 		{ label: 'ID', key: '_id' },
-		{ label: 'Category', key: 'category' },
-		{ label: 'Book name', key: 'mainText' },
-		{ label: 'Author', key: 'author' },
-		{ label: 'Price', key: 'price' },
+		{ label: 'Name', key: 'name' },
+		{ label: 'Address', key: 'address' },
+		{ label: 'Phone', key: 'phone' },
+		{ label: 'Type', key: 'type' },
+		{ label: 'Total price', key: 'totalPrice' },
 		{ label: 'Created at', key: 'createdAt' },
 		{ label: 'Updated at', key: 'updatedAt' },
 		{ label: '__v', key: '__v' },
@@ -205,7 +206,7 @@ const TableOrder = () => {
 				headerTitle="Table Order"
 				toolBarRender={() => [
 
-					<CSVLink data={currentDataTable} headers={headerCsvData} filename='books.csv'>
+					<CSVLink data={currentDataTable} headers={headerCsvData} filename='order.csv'>
 						<Button
 							key="export"
 							icon={<ExportOutlined />}

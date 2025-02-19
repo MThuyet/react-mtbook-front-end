@@ -6,6 +6,8 @@ import { useState, useEffect } from 'react';
 import { Grid } from "antd";
 import { Descriptions, Badge } from 'antd/lib';
 import 'styles/global.scss';
+import { Button, Result } from 'antd';
+import { Link } from "react-router-dom";
 
 const contentStyle: React.CSSProperties = {
 	padding: 50,
@@ -151,15 +153,21 @@ const HistoryPage = () => {
 							/>
 
 						</div>
-						: <Spin tip="Loading" size="large">
-							<div style={contentStyle}></div>
-						</Spin>
+						:
+						<Result
+							title="Bạn chưa mua đơn hàng nào"
+							extra={
+								<Button type="primary" key="console">
+									<Link to="/">Trang chủ</Link>
+								</Button>
+							}
+						/>
 					}
 				</Col>
 
 				<Col md={0} sm={24} xs={24}>
-					{dataTable && dataTable.length > 0
-						? <div style={{ marginTop: '20px auto' }}>
+					{dataTable && dataTable.length > 0 ? (
+						<div style={{ marginTop: '20px auto' }}>
 							<Table<IOrderTable>
 								bordered
 								columns={columnsMobile}
@@ -167,17 +175,23 @@ const HistoryPage = () => {
 								rowKey="_id"
 								rowHoverable={true}
 								pagination={{
-									pageSize: 5, // Số lượng item trên mỗi trang
-									pageSizeOptions: ['5', '10', '20'], // Các tùy chọn số item mỗi trang
+									pageSize: 5,
+									pageSizeOptions: ['5', '10', '20'],
 								}}
 							/>
-
 						</div>
-						: <Spin tip="Loading" size="large">
-							<div style={contentStyle}></div>
-						</Spin>
-					}
+					) : (
+						<Result
+							title="Bạn chưa mua đơn hàng nào"
+							extra={
+								<Button type="primary" key="console">
+									<Link to="/">Trang chủ</Link>
+								</Button>
+							}
+						/>
+					)}
 				</Col>
+
 			</Row>
 
 			<Drawer
@@ -212,8 +226,12 @@ const HistoryPage = () => {
 						<div className="item">
 							<span className='label'>Phương thức thanh toán:</span>
 							<div>
-								{dataDrawer.type === 'COD' ? 'Thanh toán khi nhận hàng' : 'Thanh toán online'}
-								<Badge status='processing' style={{ marginLeft: 10 }} />
+								{dataDrawer.type === 'COD' ? 'Thanh toán khi nhận hàng' : 'Thanh toán qua VNPAY'}
+								{dataDrawer.paymentStatus === 'UNPAID' ?
+									<Badge status='warning' style={{ marginLeft: 10 }} />
+									:
+									<Badge status='success' style={{ marginLeft: 10 }} />
+								}
 							</div>
 						</div>
 

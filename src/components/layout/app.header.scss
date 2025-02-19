@@ -170,3 +170,20 @@
 		}
 	}
 }
+
+.menu-mobile {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+
+
+	.menu-item {
+		padding: 10px 15px;
+		border-bottom: 1px solid #ddd;
+
+		&:first-child {
+			font-weight: 500;
+			color: #007BFF;
+		}
+	}
+}

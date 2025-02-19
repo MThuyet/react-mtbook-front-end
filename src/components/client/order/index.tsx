@@ -105,7 +105,7 @@ const OrderDetail = (props: IProps) => {
 									);
 								})
 								:
-								<Empty
+								<Empty style={{ marginBottom: 20 }}
 									description="Không có sản phẩm trong giỏ hàng"
 								/>
 							}

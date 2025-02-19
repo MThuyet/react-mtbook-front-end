@@ -14,6 +14,8 @@ import { useCurrentApp } from '../context/app.context';
 import type { MenuProps } from 'antd';
 import { logoutAPI } from '@/services/api';
 import { useEffect } from "react";
+import { BrowserView, MobileView } from 'react-device-detect';
+import { Button, Result } from 'antd';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -100,58 +102,70 @@ const LayoutAdmin = () => {
 
 	return (
 		<>
-			<Layout
-				style={{ minHeight: '100vh' }}
-				className="layout-admin"
-			>
-				<Sider
-					theme='light'
-					collapsible
-					collapsed={collapsed}
-					onCollapse={(value) => setCollapsed(value)}>
-					<div style={{ height: 32, margin: 16, textAlign: 'center' }}>
-						Admin
-					</div>
-					<Menu
-						// defaultSelectedKeys={[activeMenu]}
-						selectedKeys={[activeMenu]}
-						mode="inline"
-						items={items}
-						onClick={(e) => setActiveMenu(e.key)}
-					/>
-				</Sider>
-				<Layout>
-					<div className='admin-header' style={{
-						height: "50px",
-						borderBottom: "1px solid #ebebeb",
-						display: "flex",
-						alignItems: "center",
-						justifyContent: "space-between",
-						padding: "0 15px",
+			<BrowserView>
+				<Layout
+					style={{ minHeight: '100vh' }}
+					className="layout-admin"
+				>
+					<Sider
+						theme='light'
+						collapsible
+						collapsed={collapsed}
+						onCollapse={(value) => setCollapsed(value)}>
+						<div style={{ height: 32, margin: 16, textAlign: 'center' }}>
+							Admin
+						</div>
+						<Menu
+							// defaultSelectedKeys={[activeMenu]}
+							selectedKeys={[activeMenu]}
+							mode="inline"
+							items={items}
+							onClick={(e) => setActiveMenu(e.key)}
+						/>
+					</Sider>
+					<Layout>
+						<div className='admin-header' style={{
+							height: "50px",
+							borderBottom: "1px solid #ebebeb",
+							display: "flex",
+							alignItems: "center",
+							justifyContent: "space-between",
+							padding: "0 15px",
 
-					}}>
-						<span>
-							{React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
-								className: 'trigger',
-								onClick: () => setCollapsed(!collapsed),
-							})}
-						</span>
-						<Dropdown menu={{ items: itemsDropdown }} trigger={['click']}>
-							<Space style={{ cursor: "pointer" }}>
-								<Avatar src={urlAvatar} />
-								{user?.fullName}
-							</Space>
-						</Dropdown>
-					</div>
-					<Content style={{ padding: '15px' }}>
-						<Outlet />
-					</Content>
-					<Footer style={{ padding: 0, textAlign: "center" }}>
-						React Test Fresher &copy; Mờ Thuyết - Made with <HeartTwoTone />
-					</Footer>
+						}}>
+							<span>
+								{React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
+									className: 'trigger',
+									onClick: () => setCollapsed(!collapsed),
+								})}
+							</span>
+							<Dropdown menu={{ items: itemsDropdown }} trigger={['click']}>
+								<Space style={{ cursor: "pointer" }}>
+									<Avatar src={urlAvatar} />
+									{user?.fullName}
+								</Space>
+							</Dropdown>
+						</div>
+						<Content style={{ padding: '15px' }}>
+							<Outlet />
+						</Content>
+						<Footer style={{ padding: 0, textAlign: "center" }}>
+							React Test Fresher &copy; Mờ Thuyết - Made with <HeartTwoTone />
+						</Footer>
+					</Layout>
 				</Layout>
-			</Layout>
-
+			</BrowserView>
+			<MobileView>
+				<Result
+					status="warning"
+					title="Vui lòng sử dụng máy tính bảng hoặc laptop để sử dụng chức năng này"
+					extra={
+						<Button type="primary" key="console">
+							<Link to="/" > Trang chủ</Link >
+						</Button>
+					}
+				/>
+			</MobileView>
 		</>
 	);
 };

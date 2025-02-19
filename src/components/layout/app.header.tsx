@@ -185,11 +185,24 @@ const AppHeader = (props: IProps) => {
 				open={openDrawer}
 				width={'70vw'}
 			>
-				<p>Quản lý tài khoản</p>
-				<Divider />
+				<div className='menu-mobile'>
+					{!isAuthenticated ?
+						<>
+							<p className='menu-item' onClick={() => { navigate('/'); setOpenDrawer(false) }}>Trang chủ</p>
+							<p className='menu-item' onClick={() => { navigate('/login'); setOpenDrawer(false) }}>Đăng nhập</p>
+						</>
+						:
+						<>
+							<p className='menu-item' onClick={() => { navigate('/'); setOpenDrawer(false) }}>Trang chủ</p>
 
-				<p onClick={() => handleLogout()}>Đăng xuất</p>
-				<Divider />
+							<p className='menu-item' onClick={() => { setOpenManageAccount(true); setOpenDrawer(false) }}>Quản lý tài khoản</p>
+
+							<p className='menu-item' onClick={() => { navigate('/history'); setOpenDrawer(false) }}>Lịch sử mua hàng</p>
+
+							<p className='menu-item' onClick={() => { handleLogout(); setOpenDrawer(false) }}>Đăng xuất</p>
+						</>
+					}
+				</div>
 			</Drawer>
 
 			<ManageAccount
